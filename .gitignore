@@ -1,0 +1,6 @@
+#git ls-files --ignored --exclude-standard --others  | grep <pattern> 
+#使用以上命令来验证 pattern 是否被ignore
+#匹配.开头的文件和目录
+**/.*
+!**/.gitignore
+**/build

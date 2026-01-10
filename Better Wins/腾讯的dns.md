@@ -1,0 +1,5 @@
+**[腾讯 DNS](https://zhida.zhihu.com/search?content_id=194872434&content_type=Answer&match_order=1&q=腾讯+DNS&zd_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ6aGlkYV9zZXJ2ZXIiLCJleHAiOjE3NDA3NDY5OTksInEiOiLohb7orq8gRE5TIiwiemhpZGFfc291cmNlIjoiZW50aXR5IiwiY29udGVudF9pZCI6MTk0ODcyNDM0LCJjb250ZW50X3R5cGUiOiJBbnN3ZXIiLCJtYXRjaF9vcmRlciI6MSwiemRfdG9rZW4iOm51bGx9.8C8Th4tH9uI1R5iMBq5QC9OQC6wL8S8HIo4SsEIh_og&zhida_source=entity)**
+
+IP：119.29.29.29
+
+备用：182.254.116.116
