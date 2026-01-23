@@ -1,0 +1,6 @@
+- Yichip
+  - `$PROFILE`: `C:\Users\WY\Documents\PowerShell\Microsoft.PowerShell_profile.ps1`
+  - `repo` : `D:\Oscookbook\Better Wins\pwsh\profile-yichip.ps1`
+  - `issue` : 跨盘符，无法mklink 创建硬链接。但repo刚需真实文件而非符号链接
+  - `solve` : 把$PROFILE 软链接到D盘仓库的文件，做个反向的软链接trick
+     - `mklink "C:\Users\WY\Documents\PowerShell\Microsoft.PowerShell_profile.ps1" "D:\Oscookbook\Better Wins\pwsh\profile-yichip.ps1"`
