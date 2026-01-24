@@ -9,7 +9,7 @@ function g-sparse { & ([scriptblock]::Create((irm "https://raw.githubusercontent
 
 function obs_sync_config {
 
-    
+   g-sparse https://github.com/yceachan/OsCookbook/tree/main/.obsidian
 }
 
 
