@@ -6,7 +6,7 @@ solve：
 
 ```
 sudo vim /etc/hosts
-#找到127.0.0.1 loaclhost 追加新行
+#找到127.0.0.1 <loaclhost> 追加新行
 127.0.0.1 myhostname #当前计算机名称
 ```
 

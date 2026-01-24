@@ -1,0 +1,9 @@
+{
+  "showUnsupportedFiles": true,
+  "trashOption": "none",
+  "newLinkFormat": "relative",
+  "editor": {
+    "requireCtrlForLinks": true
+  },
+  "alwaysUpdateLinks": true
+}
