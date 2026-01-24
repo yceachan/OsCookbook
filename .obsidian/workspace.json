@@ -110,8 +110,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "right": {
     "id": "e084b13639c4ab25",
@@ -227,7 +226,7 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "8beb59a6f666c0a7",
+  "active": "76cc3c49d7cb35ba",
   "lastOpenFiles": [
     "交叉编译技术",
     "MIT-6.S081/Ref-forkLab",
