@@ -12,6 +12,28 @@ function obs_sync_config {
    g-sparse https://github.com/yceachan/OsCookbook/tree/main/.obsidian
 }
 
+function fork_obs {
+    <#
+    .SYNOPSIS
+        在当前目录下创建到 D:\Oscookbook\.obsidian 的目录联接。
+    #>
+    $target = "D:\Oscookbook\.obsidian"
+    $link = Join-Path (Get-Location) ".obsidian"
+
+    if (Test-Path $link) {
+        Write-Error "错误：当前路径下已存在 .obsidian。"
+        return
+    }
+
+    if (-not (Test-Path $target)) {
+        Write-Error "错误：目标路径 $target 不存在。"
+        return
+    }
+
+    # 执行创建命令，遵循 UTF-8 规范
+  cmd /c mklink /j ".obsidian" "$target"
+}
+
 
 function update_gemini {
     npm install -g @google/gemini-cli@latest

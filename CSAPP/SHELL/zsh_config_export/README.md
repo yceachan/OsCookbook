@@ -1,5 +1,5 @@
 ```sh
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/yceachan/OsCookbook/refs/heads/main/CSAPP/SHELL/h_config_export/install.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/yceachan/OsCookbook/refs/heads/main/CSAPP/SHELL/zsh_config_export/install.sh)"
 ```
 
  命令解析：
