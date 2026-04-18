@@ -11,7 +11,10 @@ function obs_sync_config {
 
    g-sparse https://github.com/yceachan/OsCookbook/tree/main/.obsidian
 }
-
+# i write this to againsit pwsh7.6 wsl ~ non useful ever more
+function ws {
+   wsl '~'
+}
 
 function update_gemini {
     npm install -g @google/gemini-cli@latest

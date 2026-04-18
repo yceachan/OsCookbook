@@ -1,0 +1,58 @@
+{
+    
+    "uint8":{
+        "scope": "c,cpp",
+        "prefix": "u8",
+        "body": "uint8_t",
+    },
+     
+    "uint16":{
+        "scope": "c,cpp",
+        "prefix": "u16",
+        "body": "uint16_t",
+    },
+     
+    "uint32":{
+        "scope": "c,cpp",
+        "prefix": "u32",
+        "body": "uint32_t",
+    },
+     "uint64":{
+        "scope": "c,cpp",
+        "prefix": "u64",
+        "body": "uint64_t",
+    },
+
+    "@Header Guard": {
+        "scope": "c,cpp",
+        "prefix": "@hg",
+        "body": [
+            "#ifndef _${TM_FILENAME_BASE/(.*)/${1:/upcase}/}_H_",
+            "#define _${TM_FILENAME_BASE/(.*)/${1:/upcase}/}_H_",
+            "",
+            "$0",
+            "",
+            "#endif //_${TM_FILENAME_BASE/(.*)/${1:/upcase}/}_H_"
+        ],
+        "description": "Generate header guard based on filename"
+    },
+    "@readme" :{
+        "scope": "c,cpp",
+        "prefix": "@readme",
+        "body": [
+           "/*============================================================**",
+           "*@READNME:",
+           "  $0",
+           "*=============================================================*/"
+        ]
+    },
+    "@struct" :{
+         "scope": "c",
+        "prefix": "@struct",
+        "body": [
+            "typedef struct {",
+            "    $1",
+            "}$0",
+        ]
+    }
+}
