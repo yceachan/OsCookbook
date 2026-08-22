@@ -4,7 +4,5 @@
 **/build
 **/output
 
-.obsidian/
 !**.gitignore
 !**profile/
-Better Wins/fonts/
