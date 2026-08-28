@@ -1,0 +1,184 @@
+% !TeX program = xelatex
+% !TeX encoding = UTF-8
+\documentclass[UTF8,zihao=-4,fontset=windows]{ctexart}
+
+% ---------- 页面与字体（像 Word 的“页面布局 / 字体”） ----------
+\usepackage[a4paper,top=2.54cm,bottom=2.54cm,left=3.00cm,right=2.50cm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\setCJKmainfont[BoldFont=SimHei]{SimSun}
+\setCJKsansfont{Microsoft YaHei}
+
+% ---------- 段落（像 Word 的“段落”对话框） ----------
+\usepackage{setspace}
+\setstretch{1.5}                 % 1.5 倍行距
+\setlength{\parindent}{2em}      % 首行缩进 2 个汉字
+\setlength{\parskip}{0pt}        % 段后间距
+\usepackage{ragged2e}
+\AtBeginDocument{\justifying}   % 两端对齐
+
+% ---------- 标题、页眉页脚、图表与数学 ----------
+\ctexset{
+  section={format=\heiti\zihao{3},beforeskip=18pt,afterskip=10pt},
+  subsection={format=\heiti\zihao{4},beforeskip=14pt,afterskip=7pt},
+  subsubsection={format=\heiti\zihao{-4},beforeskip=10pt,afterskip=5pt}
+}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\captionsetup{font=small,labelsep=quad}
+\usepackage{enumitem}
+\setlist{nosep,leftmargin=2em}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[C]{\zihao{5} LaTeX 论文写作示例}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{14pt}
+
+% Figure 演示用占位框：换成 \includegraphics 即可使用真实图片。
+\newcommand{\figureplaceholder}[3][4cm]{%
+  \fbox{\parbox[c][#1][c]{\dimexpr#2-2\fboxsep-2\fboxrule\relax}{%
+    \centering\sffamily\zihao{5}#3}}
+}
+
+% ---------- 参考文献 ----------
+\usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
+\addbibresource{references.bib}
+
+\title{LaTeX 中文论文写作示例}
+\author{作者姓名}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+这是一份可直接编译的中文论文起始模板。正文默认小四号、1.5 倍行距、首行缩进两个汉字，并展示标题、对齐、公式、表格和参考文献。将这里替换为你的摘要。
+\end{abstract}
+
+\section{像 Word 一样控制排版}
+
+正文的全局字号由文档类选项 \verb|zihao=-4| 控制，即小四号。局部字号和精确磅值可以分别写成：
+\begin{flushleft}
+  \verb|{\zihao{5} 五号文字}|\\
+  \verb|{\fontsize{10.5pt}{16pt}\selectfont 文字}|
+\end{flushleft}
+精确字号命令中的第二个数字是基线间距。
+
+段落间距、首行缩进和行距集中写在导言区，通常不应逐段手调。需要取消缩进时使用
+\verb|\noindent|。居中、左对齐和右对齐分别使用 \verb|center|、\verb|flushleft|、
+\verb|flushright| 环境。
+
+\begin{center}
+  这是一行居中的文字。
+\end{center}
+
+\subsection{公式与编号}
+
+行内公式例如 $E=mc^2$。独立且自动编号的公式如下：
+\begin{equation}
+  f(x)=\int_{-\infty}^{\infty}\hat f(\xi)e^{2\pi i x\xi}\,\mathrm{d}\xi.
+  \label{eq:fourier}
+\end{equation}
+上式可以被交叉引用；在 LaTeX 中使用 \verb|\label| 标记，再用 \verb|\eqref| 引用即可。
+
+\subsection{表格}
+
+\begin{table}[htbp]
+  \centering
+  \caption{常见中文字号与磅值近似对应}
+  \label{tab:font-size}
+  \begin{tabular}{ccc}
+    \toprule
+    中文字号 & LaTeX 命令 & 近似磅值 \\
+    \midrule
+    三号 & \verb|\zihao{3}| & 16 pt \\
+    小四 & \verb|\zihao{-4}| & 12 pt \\
+    五号 & \verb|\zihao{5}| & 10.5 pt \\
+    小五 & \verb|\zihao{-5}| & 9 pt \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Figure 布局演示}
+
+\subsection{单图：按栏宽缩放}
+
+\begin{figure}[htbp]
+  \centering
+  % 真实图片：\includegraphics[width=0.82\linewidth]{figures/result.pdf}
+  \figureplaceholder[4.5cm]{0.82\linewidth}{单图占位\\[4pt]
+    \texttt{width=0.82\textbackslash linewidth}}
+  \caption{单图居中，宽度为当前栏宽的 82\%}
+  \label{fig:single}
+\end{figure}
+
+\subsection{并排双图：各自标题与总标题}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    % \includegraphics[width=\linewidth]{figures/method-a.pdf}
+    \figureplaceholder[3.6cm]{\linewidth}{子图 A}
+    \caption{方法 A}
+    \label{fig:pair-a}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    % \includegraphics[width=\linewidth]{figures/method-b.pdf}
+    \figureplaceholder[3.6cm]{\linewidth}{子图 B}
+    \caption{方法 B}
+    \label{fig:pair-b}
+  \end{subfigure}
+  \caption{两个等宽子图；\texttt{\textbackslash hfill} 自动分配中间空隙}
+  \label{fig:pair}
+\end{figure}
+
+引用整个图用“图~\ref{fig:pair}”，引用其中一幅用“图~\ref{fig:pair-a}”。
+
+\subsection{2×2 子图网格}
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \figureplaceholder[2.5cm]{\linewidth}{子图 A}
+    \caption{数据集 A}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \figureplaceholder[2.5cm]{\linewidth}{子图 B}
+    \caption{数据集 B}
+  \end{subfigure}
+
+  \medskip
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \figureplaceholder[2.5cm]{\linewidth}{子图 C}
+    \caption{数据集 C}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \figureplaceholder[2.5cm]{\linewidth}{子图 D}
+    \caption{数据集 D}
+  \end{subfigure}
+  \caption{四个子图组成的 2×2 网格}
+  \label{fig:grid}
+\end{figure}
+
+浮动参数 \verb|[htbp]| 表示依次尝试当前位置、页顶、页底和单独浮动页。双栏论文中，
+普通 \verb|figure| 只占一栏；把环境改成 \verb|figure*| 可跨两栏，通常出现在页顶。
+
+\section{引用与投稿格式}
+
+LaTeX 的优势是将内容与版式分离。投稿时通常替换 \verb|\documentclass|，并按期刊要求加载其
+\verb|.cls| 或官方模板，不必逐段重排。参考文献可以像这样引用经典文献~\cite{knuth1984}。
+
+\printbibliography
+\end{document}

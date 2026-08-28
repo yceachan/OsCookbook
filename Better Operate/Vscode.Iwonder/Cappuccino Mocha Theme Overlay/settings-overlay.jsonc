@@ -1,0 +1,149 @@
+{
+  // VS Code uses the official spelling "Catppuccin" for this theme family.
+  "workbench.colorTheme": "Catppuccin Mocha",
+  "window.titleBarStyle": "custom",
+  "workbench.iconTheme": "material-icon-theme",
+
+  "workbench.colorCustomizations": {
+    "[Catppuccin Mocha]": {
+      "activityBar.background": "#191927",
+      "activityBar.border": "#313244",
+      "activityBarTop.background": "#191927",
+      "sideBar.background": "#191927",
+      "sideBar.border": "#313244",
+      "sideBarSectionHeader.background": "#191927",
+      "titleBar.activeBackground": "#191927",
+      "titleBar.inactiveBackground": "#191927",
+      "titleBar.border": "#313244",
+      "panel.background": "#191927",
+      "panel.border": "#313244",
+      "statusBar.background": "#191927",
+      "statusBar.border": "#313244",
+      "statusBar.noFolderBackground": "#191927",
+      "statusBar.noFolderBorder": "#313244",
+      "commandCenter.background": "#191927",
+      "commandCenter.border": "#313244",
+      "commandCenter.inactiveBorder": "#313244",
+      "debugToolBar.background": "#191927",
+      "debugToolBar.border": "#313244",
+      "editorGroupHeader.tabsBackground": "#191927",
+      "editorGroup.emptyBackground": "#191927",
+      "editorGroup.border": "#313244",
+      "tab.inactiveBackground": "#191927",
+      "tab.unfocusedInactiveBackground": "#191927",
+      "tab.border": "#313244",
+
+      "list.activeSelectionBackground": "#25253A",
+      "list.activeSelectionForeground": "#C6C3D3",
+      "list.inactiveSelectionBackground": "#222234",
+      "list.inactiveSelectionForeground": "#B8B5C5",
+      "list.focusBackground": "#25253A",
+      "list.focusForeground": "#C6C3D3",
+      "list.hoverBackground": "#222234B3",
+      "list.hoverForeground": "#B8B5C5",
+      "list.focusAndSelectionBackground": "#25253A",
+      "list.highlightForeground": "#B7ADC9",
+      "sideBar.foreground": "#B8B5C5",
+      "sideBarTitle.foreground": "#B7ADC9",
+      "activityBar.foreground": "#B7ADC9",
+      "badge.background": "#3A384B",
+      "badge.foreground": "#C0BBD0",
+
+      "gitDecoration.addedResourceForeground": "#718B79",
+      "gitDecoration.untrackedResourceForeground": "#718B79",
+      "gitDecoration.modifiedResourceForeground": "#9A8C66",
+      "gitDecoration.stageModifiedResourceForeground": "#9A8C66",
+      "gitDecoration.deletedResourceForeground": "#907783",
+      "gitDecoration.stageDeletedResourceForeground": "#907783",
+      "gitDecoration.conflictingResourceForeground": "#8D829F",
+      "gitDecoration.submoduleResourceForeground": "#7E8D9D",
+      "gitDecoration.ignoredResourceForeground": "#5F6370",
+
+      "editor.selectionBackground": "#585B70",
+      "editor.selectionHighlightBackground": "#45475A80",
+      "editor.inactiveSelectionBackground": "#45475A66"
+    }
+  },
+
+  "editor.semanticTokenColorCustomizations": {
+    "[Catppuccin Mocha]": {
+      "enabled": true,
+      "rules": {
+        "comment": "#86A994"
+      }
+    }
+  },
+
+  "editor.tokenColorCustomizations": {
+    "[Catppuccin Mocha]": {
+      "textMateRules": [
+        {
+          "scope": [
+            "comment",
+            "punctuation.definition.comment"
+          ],
+          "settings": {
+            "foreground": "#86A994",
+            "fontStyle": "italic"
+          }
+        }
+      ]
+    }
+  },
+
+  "material-icon-theme.opacity": 0.68,
+  "material-icon-theme.saturation": 0.42,
+  "material-icon-theme.files.color": "#9290A0",
+  "material-icon-theme.folders.color": "#918BA5",
+  "material-icon-theme.rootFolders.color": "#9D95AF",
+
+  "better-comments.tags": [
+    {
+      "tag": "?",
+      "color": "#7E9FB5",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "transparent",
+      "bold": false,
+      "italic": false
+    },
+    {
+      "tag": "todo",
+      "color": "#B49B6B",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "transparent",
+      "bold": false,
+      "italic": false
+    },
+    {
+      "tag": "issue",
+      "color": "#B07E89",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "transparent",
+      "bold": false,
+      "italic": false
+    },
+    {
+      "tag": "tip",
+      "color": "#86A894",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "transparent",
+      "bold": false,
+      "italic": false
+    },
+    {
+      "tag": "*",
+      "color": "#7FA88C",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "transparent",
+      "bold": false,
+      "italic": false
+    }
+  ],
+  "better-comments.multilineComments": true,
+  "better-comments.highlightPlainText": true
+}
