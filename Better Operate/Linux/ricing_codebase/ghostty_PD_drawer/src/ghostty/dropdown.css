@@ -1,0 +1,4 @@
+/* Match the 5 px window radius from the main Breeze GTK theme. */
+window.terminal-window {
+  border-radius: 5px;
+}

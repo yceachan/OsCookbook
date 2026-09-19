@@ -1,0 +1,14 @@
+{
+    "KPlugin": {
+        "Name": "Ghostty PD Drawer",
+        "Description": "Toggle a screen-aware Ghostty tmux drawer and promote its session",
+        "Icon": "com.mitchellh.ghostty",
+        "Id": "ghostty-dropdown",
+        "Version": "1.1",
+        "License": "MIT",
+        "EnabledByDefault": false
+    },
+    "X-Plasma-API": "javascript",
+    "X-Plasma-MainScript": "code/main.js",
+    "KPackageStructure": "KWin/Script"
+}

@@ -1,0 +1,21 @@
+# Dedicated Ghostty profile for the Plasma drop-down terminal.
+theme = Catppuccin Mocha
+font-family = Hack Nerd Font Mono
+font-size = 12
+window-padding-x = 12
+window-padding-y = 12
+window-theme = dark
+background-opacity = 1.0
+
+working-directory = @HOME@
+command = @TMUX_BIN@ new-session -A -s @TMUX_SESSION@
+window-decoration = client
+gtk-titlebar = false
+gtk-custom-css = @CONFIG_HOME@/ghostty/dropdown.css
+window-show-tab-bar = never
+gtk-single-instance = false
+confirm-close-surface = false
+keybind = ctrl+w=close_surface
+keybind = escape=toggle_maximize
+keybind = ctrl+shift+n=unbind
+keybind = ctrl+shift+t=unbind

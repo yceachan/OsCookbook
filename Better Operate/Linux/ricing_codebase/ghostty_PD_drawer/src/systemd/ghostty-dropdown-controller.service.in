@@ -1,0 +1,17 @@
+[Unit]
+Description=Control the Ghostty PD drawer
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=simple
+Environment=GHOSTTY_PD_DRAWER_GHOSTTY=@GHOSTTY_BIN@
+Environment=GHOSTTY_PD_DRAWER_TMUX=@TMUX_BIN@
+Environment=GHOSTTY_PD_DRAWER_SYSTEMD_RUN=@SYSTEMD_RUN_BIN@
+Environment=GHOSTTY_PD_DRAWER_KWRITECONFIG=@KWRITECONFIG_BIN@
+Environment=GHOSTTY_PD_DRAWER_TMUX_SESSION=@TMUX_SESSION@
+ExecStart=@PYTHON_BIN@ @CONTROLLER_PATH@
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target
