@@ -10,5 +10,7 @@
   "y": 0,
   "focusMode": true,
   "hotkeyModifiers": 16392,
-  "hotkeyVirtualKey": 192
+  "hotkeyVirtualKey": 192,
+  "detachHotkeyVirtualKey": 70,
+  "detachActionVirtualKey": 123
 }

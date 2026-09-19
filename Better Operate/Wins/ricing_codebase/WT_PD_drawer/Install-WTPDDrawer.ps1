@@ -78,6 +78,8 @@ if ($PSCmdlet.ShouldProcess($InstallRoot, 'Install WT_PD_drawer')) {
         focusMode = $true
         hotkeyModifiers = 16392
         hotkeyVirtualKey = 192
+        detachHotkeyVirtualKey = 70
+        detachActionVirtualKey = 123
     }
     Write-Utf8NoBom -Path (Join-Path $InstallRoot 'config.json') -Content ($config | ConvertTo-Json)
 
@@ -92,14 +94,44 @@ if ($PSCmdlet.ShouldProcess($InstallRoot, 'Install WT_PD_drawer')) {
     if ($settings.PSObject.Properties['actions']) {
         $settings.actions = @($settings.actions | Where-Object {
             $_.id -ne 'User.DropdownTerminal' -and
+            $_.id -ne 'User.WTPDDrawerDetach' -and
             -not ($_.command -and $_.command.action -eq 'globalSummon' -and $_.command.name -eq 'dropdown-terminal')
         })
     }
+    else {
+        $settings | Add-Member NoteProperty actions @()
+    }
+    $detachAction = [pscustomobject][ordered]@{
+        command = [pscustomobject][ordered]@{
+            action = 'multipleActions'
+            actions = @(
+                [pscustomobject][ordered]@{ action = 'renameTab'; title = 'Terminal' },
+                [pscustomobject][ordered]@{ action = 'moveTab'; window = 'new' }
+            )
+        }
+        id = 'User.WTPDDrawerDetach'
+        name = 'Detach WT drawer to a normal window'
+    }
+    $settings.actions = @($settings.actions) + $detachAction
     if ($settings.PSObject.Properties['keybindings']) {
         $settings.keybindings = @($settings.keybindings | Where-Object {
             $keys = @($_.keys)
-            $_.id -ne 'User.DropdownTerminal' -and -not ($keys -contains 'win+`')
+            $_.id -ne 'User.DropdownTerminal' -and
+            $_.id -ne 'User.WTPDDrawerDetach' -and
+            -not ($keys -contains 'win+`') -and
+            -not ($keys -contains 'ctrl+shift+f12')
         })
+    }
+    else {
+        $settings | Add-Member NoteProperty keybindings @()
+    }
+    $settings.keybindings = @($settings.keybindings) + [pscustomobject][ordered]@{
+        id = 'User.WTPDDrawerDetach'
+        keys = 'ctrl+shift+f12'
+    }
+    $settings.keybindings = @($settings.keybindings) + [pscustomobject][ordered]@{
+        id = 'unbound'
+        keys = 'win+`'
     }
     if (-not $KeepLegacyGlobalWindowSettings) {
         foreach ($property in 'initialCols', 'initialRows', 'initialPosition') {
