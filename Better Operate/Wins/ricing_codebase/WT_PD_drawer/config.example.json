@@ -1,0 +1,14 @@
+{
+  "terminalExecutable": "%LOCALAPPDATA%\\Microsoft\\WindowsApps\\wt.exe",
+  "windowName": "dropdown-terminal",
+  "windowTitle": "__WT_PD_DRAWER__",
+  "profile": "",
+  "startingDirectory": "%USERPROFILE%",
+  "columns": 90,
+  "rows": 15,
+  "x": 373,
+  "y": 0,
+  "focusMode": true,
+  "hotkeyModifiers": 16392,
+  "hotkeyVirtualKey": 192
+}
