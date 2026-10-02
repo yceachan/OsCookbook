@@ -1,9 +1,0 @@
-[Unit]
-Description=Ghostty PD drawer
-PartOf=graphical-session.target
-After=graphical-session.target
-
-[Service]
-Type=simple
-WorkingDirectory=@HOME@
-ExecStart=@GHOSTTY_BIN@ --config-default-files=false --config-file=@CONFIG_HOME@/ghostty/dropdown.ghostty --class=com.mitchellh.ghostty.dropdown

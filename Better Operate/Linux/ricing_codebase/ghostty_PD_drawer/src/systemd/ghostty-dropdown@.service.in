@@ -1,0 +1,15 @@
+[Unit]
+Description=Ghostty PD drawer instance %i
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=simple
+WorkingDirectory=@HOME@
+# The drawer shell knows which instance it belongs to and which zsh overlay it
+# should start with; see src/zsh/drawer-zshrc.in.
+Environment=GHOSTTY_PD_DRAWER_INSTANCE=%i
+Environment=ZDOTDIR=@DRAWER_ZDOTDIR@
+ExecStart=@GHOSTTY_BIN@ --config-default-files=false --config-file=%t/ghostty-pd-drawer/%i.ghostty --gtk-single-instance=false --class=com.mitchellh.ghostty.dropdown
+ExecReload=@KILL_BIN@ -USR2 $MAINPID
+ExecStopPost=@RM_BIN@ -f %t/ghostty-pd-drawer/%i.ghostty

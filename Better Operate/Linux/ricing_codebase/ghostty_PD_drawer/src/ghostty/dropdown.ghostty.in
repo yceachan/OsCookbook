@@ -1,21 +1,20 @@
-# Dedicated Ghostty profile for the Plasma drop-down terminal.
-theme = Catppuccin Mocha
-font-family = Hack Nerd Font Mono
-font-size = 12
-window-padding-x = 12
-window-padding-y = 12
-window-theme = dark
-background-opacity = 1.0
-
+# Drawer-only overrides. The controller asks Ghostty to merge these with the
+# user's default files into one per-instance config before the window starts,
+# so anything not listed here follows the main terminal configuration.
 working-directory = @HOME@
-command = @TMUX_BIN@ new-session -A -s @TMUX_SESSION@
+
+# Client-side decorations, exactly like the main terminal, so the drawer inherits
+# the same rounded corners from the GTK theme instead of hardcoding a radius.
 window-decoration = client
 gtk-titlebar = false
-gtk-custom-css = @CONFIG_HOME@/ghostty/dropdown.css
+gtk-titlebar-style = native
 window-show-tab-bar = never
+
+# KWin owns the drawer geometry; do not let Ghostty's configured window size
+# (window-width/window-height from the user's config) fight the KWin window rule.
+window-width = 0
+window-height = 0
+
 gtk-single-instance = false
-confirm-close-surface = false
-keybind = ctrl+w=close_surface
-keybind = escape=toggle_maximize
 keybind = ctrl+shift+n=unbind
 keybind = ctrl+shift+t=unbind

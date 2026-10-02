@@ -1,8 +1,8 @@
-# tmux is all you need
+# vimtmux is all you need
 
 这篇文档只解决一个核心问题：怎样让终端里的工作脱离某个窗口继续存在，并且随时从另一个终端接回来。
 
-项目文件名保留了 `tmus` 的原始拼写；工具的正确名字是 **tmux**，可以理解成 terminal multiplexer（终端复用器）。
+工具的名字是 **tmux**，可以理解成 terminal multiplexer（终端复用器）。当前 drawer 功能不再自动启动或接管 tmux；本文只保留为手动使用 tmux 的独立指南。
 
 ## 先建立正确的模型
 
@@ -32,9 +32,9 @@ Ghostty 窗口 → tmux client ─┐
 
 所谓“把任务 disown 出来”，在 tmux 中更准确地叫 **detach client**：程序仍属于 tmux 的 PTY，只是当前 Ghostty 不再显示它。稍后 attach 一个新 client，就能看到完全相同的终端状态。
 
-## 你的 drawer 已经怎样使用 tmux
+## 手动建立一个长期 session
 
-按 `Win+\`` 时，drawer 实际执行：
+在任意终端执行：
 
 ```bash
 tmux new-session -A -s ghostty-pd-drawer
@@ -46,19 +46,11 @@ tmux new-session -A -s ghostty-pd-drawer
 - `-s ghostty-pd-drawer`：指定固定名字。
 - `-A`：如果同名 session 已存在，则 attach，而不是创建失败。
 
-所以最常用的流程只有三步：
+最常用的流程只有三步：
 
-1. `Win+\`` 打开 drawer，在里面启动编译、日志监控或其他长任务。
+1. 在 session 里启动编译、日志监控或其他长任务。
 2. 按 `Ctrl+b`，松开，再按 `d`，从 session 分离。
-3. 以后再次按 `Win+\``，或者在任意终端执行 `tmux attach -t ghostty-pd-drawer` 恢复现场。
-
-按 `Win+F` 时，项目会新建普通 Ghostty，并执行等价于：
-
-```bash
-tmux new-session -A -D -s ghostty-pd-drawer
-```
-
-`-D` 表示先分离这个 session 的其他 client，再由新窗口接管。因此 `Win+F` 是“转移”，不是多开一个镜像。若你本来就在另一台终端查看该 session，它也会被断开。
+3. 以后在任意终端执行 `tmux attach -t ghostty-pd-drawer` 恢复现场。
 
 ## Prefix：tmux 快捷键为什么要按两段
 
@@ -259,8 +251,6 @@ tmux source-file ~/.tmux.conf
 - `Ctrl+c`：给当前前台程序发送中断信号。
 - `exit` 或 `Ctrl+d`：退出当前 shell；最后一个 pane 退出时 session 会消失。
 - `Prefix d`：只断开 client，里面的 shell 和程序继续运行。
-- `Win+\``：收起或展开 drawer 窗口，本身不要求 tmux client 断开。
-- `Win+F`：在普通 Ghostty 中接管 drawer session，并断开旧 client。
 
 ### 找不到 session
 

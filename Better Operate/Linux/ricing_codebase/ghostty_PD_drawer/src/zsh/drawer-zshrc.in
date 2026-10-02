@@ -1,0 +1,35 @@
+# Drawer-only zsh startup file.
+#
+# The drawer unit starts zsh with ZDOTDIR pointing at this directory, so zsh
+# reads this file instead of ~/.zshrc. The user's own startup files stay in
+# charge: this file hands ZDOTDIR back and then sources the real ~/.zshrc.
+#
+# The only drawer-specific behavior is ESC at the prompt: it hides the drawer
+# instead of being sent to the shell. Pressing ESC anywhere else (vim, less, a
+# REPL) is never intercepted, and once the drawer is promoted to a normal
+# window with Meta+F the controller rejects the request, so ESC stays with the
+# running program.
+
+ZDOTDIR=@USER_ZDOTDIR@
+[[ -r @USER_ZDOTDIR@/.zshrc ]] && source @USER_ZDOTDIR@/.zshrc
+
+function _ghostty_pd_drawer_hide() {
+    (( $+commands[gdbus] )) || return 0
+    [[ -n ${GHOSTTY_PD_DRAWER_INSTANCE-} ]] || return 0
+    gdbus call --session \
+        --dest com.mitchellh.ghostty.DropdownController \
+        --object-path /com/mitchellh/ghostty/DropdownController \
+        --method com.mitchellh.ghostty.DropdownController.HideInstance \
+        "${GHOSTTY_PD_DRAWER_INSTANCE}" >/dev/null 2>&1
+}
+
+# Re-applied at every prompt: prompt themes and plugins are free to reset key
+# bindings while the shell starts up.
+function _ghostty_pd_drawer_bind_escape() {
+    bindkey -M emacs '^[' _ghostty_pd_drawer_hide
+}
+
+zle -N _ghostty_pd_drawer_hide
+_ghostty_pd_drawer_bind_escape
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd _ghostty_pd_drawer_bind_escape
