@@ -1,0 +1,16 @@
+[Unit]
+Description=Run Codex hello at 07:00, 12:00, 17:00, and 22:00
+
+[Timer]
+OnCalendar=*-*-* 07:00:00
+OnCalendar=*-*-* 12:00:00
+OnCalendar=*-*-* 17:00:00
+OnCalendar=*-*-* 22:00:00
+AccuracySec=1s
+RandomizedDelaySec=0
+Persistent=false
+Unit=codex-hello.service
+
+[Install]
+WantedBy=timers.target
+
