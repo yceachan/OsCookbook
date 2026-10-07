@@ -1,0 +1,14 @@
+[Unit]
+Description=Keep FSearch ready for the desktop drawer
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=dbus
+BusName=io.github.cboxdoerfer.FSearch
+ExecStart=/usr/bin/fsearch --minimized
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=graphical-session.target

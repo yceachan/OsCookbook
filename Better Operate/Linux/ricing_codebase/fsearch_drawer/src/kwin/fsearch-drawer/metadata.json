@@ -1,0 +1,13 @@
+{
+    "KPlugin": {
+        "Id": "fsearch-drawer",
+        "Name": "FSearch Drawer",
+        "Description": "Keep FSearch available on the focused screen",
+        "Version": "0.1",
+        "License": "MIT",
+        "EnabledByDefault": false
+    },
+    "X-Plasma-API": "javascript",
+    "X-Plasma-MainScript": "code/main.js",
+    "KPackageStructure": "KWin/Script"
+}

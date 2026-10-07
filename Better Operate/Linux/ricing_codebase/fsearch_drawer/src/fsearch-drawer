@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+exec qdbus org.kde.kglobalaccel /component/kwin \
+    org.kde.kglobalaccel.Component.invokeShortcut 'Show FSearch Drawer'
