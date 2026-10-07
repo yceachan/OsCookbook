@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+kotofox_script=$(readlink -f -- "$0")
+kotofox_root=$(CDPATH= cd -- "$(dirname -- "$kotofox_script")" && pwd)
+exec /usr/bin/python3 -s "$kotofox_root/src/main.py" "$@"

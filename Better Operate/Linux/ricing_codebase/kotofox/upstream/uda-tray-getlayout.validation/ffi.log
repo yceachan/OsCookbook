@@ -1,0 +1,103 @@
+   Compiling uda-ffi v0.1.0 (/tmp/kotofox-work/uda/crates/uda-ffi)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.89s
+     Running unittests src/lib.rs (target/debug/deps/uda_ffi-d1691666176114cf)
+
+running 89 tests
+test dispatch::tests::handle_zero_is_not_a_valid_lock ... ok
+test dispatch::tests::file_scheme_is_stripped_from_paths ... ok
+test dispatch::tests::theme_codes_match_the_c_header ... ok
+test dispatch::tests::releasing_an_unknown_handle_is_an_error_not_a_panic ... ok
+test error::tests::every_documented_code_has_a_message ... ok
+test error::tests::invalid_argument_is_reported_before_the_typed_errors ... ok
+test error::tests::failure_messages_are_never_empty ... ok
+test error::tests::status_codes_are_distinct_and_negative_on_failure ... ok
+test error::tests::uda_errors_map_to_the_documented_codes ... ok
+test media::tests::a_negative_command_code_is_rejected ... ok
+test media::tests::a_valid_command_code_is_accepted ... ok
+test media::tests::an_unknown_command_code_is_rejected_rather_than_guessed ... ok
+test media::tests::command_codes_match_the_c_header ... ok
+test media::tests::status_codes_match_the_c_header ... ok
+test notify::tests::a_trailing_record_without_a_label_is_dropped ... ok
+test notify::tests::an_empty_icon_is_passed_through_unchanged ... ok
+test notify::tests::an_icon_path_is_kept_verbatim_for_the_backend ... ok
+test notify::tests::empty_records_are_skipped_rather_than_paired ... ok
+test notify::tests::the_app_name_becomes_the_toast_identity ... ok
+test notify::tests::the_title_and_body_reach_the_notification_verbatim ... ok
+test session::tests::a_backend_error_is_reported_not_swallowed ... ok
+test session::tests::every_capability_bit_is_answerable_by_a_reported_flag_set ... ok
+test session::tests::the_guard_dispatches_a_supported_action ... ok
+test session::tests::capability_bits_are_distinct_and_stable ... ok
+test session::tests::the_guard_refuses_an_action_the_platform_lacks ... ok
+test session::tests::capability_bits_match_the_core_definitions ... ok
+test notify::tests::actions_are_split_into_key_label_pairs ... ok
+test notify::tests::an_empty_app_name_falls_back_to_the_generic_identity ... ok
+test tests::accent_color_rejects_a_null_out_parameter ... ok
+test tests::detect_theme_rejects_a_null_out_parameter ... ok
+test session::tests::one_flags_does_not_authorise_another ... ok
+test tests::free_string_of_null_is_a_no_op ... ok
+test tests::get_wallpaper_rejects_a_null_out_parameter ... ok
+test tests::fill_mode_codes_are_accepted_and_rejected ... ok
+test tests::last_error_message_is_null_when_nothing_failed ... ok
+test session::tests::the_capability_query_neither_errors_nor_lies ... ok
+test tests::notify_rejects_a_null_out_parameter ... ok
+test tests::set_wallpaper_rejects_a_null_path ... ok
+test tests::set_wallpaper_rejects_an_unknown_fill_mode ... ok
+test tests::status_constants_match_the_error_module ... ok
+test tests::wakelock_release_of_zero_is_an_invalid_argument ... ok
+test tests::status_message_pointer_is_readable_and_static ... ok
+test tray::tests::a_checkbox_callback_reports_the_new_state ... ok
+test tray::tests::a_menu_handle_cannot_be_destroyed_twice ... ok
+test tray::tests::a_menu_handle_cannot_receive_rows_after_destruction ... ok
+test tray::tests::a_menu_handle_is_not_accepted_where_an_icon_is_expected ... ok
+test tests::wake_lock_codes_are_accepted_and_rejected ... ok
+test tray::tests::a_null_callback_yields_a_plain_row_rather_than_an_error ... ok
+test tests::wakelock_acquire_rejects_a_null_handle_slot ... ok
+test tray::tests::a_text_row_callback_fires_with_the_row_id_and_user_data ... ok
+test tray::tests::a_typed_failure_leaves_a_message_for_the_caller ... ok
+test tray::tests::a_typo_between_handle_kinds_names_the_real_kind ... ok
+test tray::tests::an_empty_label_is_rejected_before_the_row_exists ... ok
+test tray::tests::every_rejection_carries_a_readable_diagnosis ... ok
+test tray::tests::menu_handles_are_unique_and_non_zero ... ok
+test tray::tests::destroying_an_unknown_icon_handle_is_an_error ... ok
+test tray::tests::set_menu_reports_a_handle_mix_up_without_losing_either_record ... ok
+test util::tests::c_string_round_trip_through_free ... ok
+test tray::tests::menu_rows_are_mapped_to_stable_non_zero_ids_in_order ... ok
+test util::tests::free_of_null_is_a_no_op ... ok
+test util::tests::formatted_panic_messages_also_survive ... ok
+test util::tests::an_owned_string_payload_is_unwrapped ... ok
+test util::tests::invalid_argument_is_reported_as_such ... ok
+test util::tests::interior_null_byte_yields_a_null_pointer_not_a_short_string ... ok
+test util::tests::invalid_utf8_is_rejected_without_reading_past_the_terminator ... ok
+test util::tests::null_pointer_is_an_invalid_argument ... ok
+test util::tests::panic_payloads_without_a_string_are_still_described ... ok
+test util::tests::panic_is_contained_and_reported_as_panic_status ... ok
+test util::tests::success_path_returns_ok_and_leaves_no_message ... ok
+test util::tests::typed_failure_records_its_message_and_status ... ok
+test util::tests::valid_c_string_round_trips ... ok
+test wakelocks::tests::cli_lock_arguments_cover_the_requested_flags ... ok
+test wakelocks::tests::handles_are_unique_and_non_zero ... ok
+test dispatch::tests::detect_theme_reports_a_documented_code ... ok
+test tests::detect_theme_writes_into_the_out_parameter ... ok
+test tests::wakelock_acquire_release_round_trip ... ok
+test wakelocks::tests::acquire_and_release_round_trip_through_the_registry ... ok
+test wakelocks::tests::double_release_is_reported_not_silently_ignored ... ok
+test media::tests::the_status_read_never_errors ... ok
+test wakelocks::tests::many_locks_can_be_held_and_released_independently ... ok
+test wakelocks::tests::releasing_an_unknown_handle_fails_without_touching_the_table ... ok
+test media::tests::the_metadata_read_reports_none_or_metadata ... ok
+test media::tests::a_command_without_a_player_is_reported_not_swallowed ... ok
+test tests::accent_color_either_writes_four_channels_or_reports_none ... ok
+test tests::get_wallpaper_fills_the_out_pointer_or_null ... ok
+test dispatch::tests::set_wallpaper_rejects_an_empty_path ... ok
+test tests::notify_transports_actions_as_a_flat_list ... ok
+test tests::notify_accepts_null_strings_as_empty ... ok
+test tests::set_wallpaper_rejects_an_empty_path ... ok
+
+test result: ok. 89 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+   Doc-tests uda_ffi
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

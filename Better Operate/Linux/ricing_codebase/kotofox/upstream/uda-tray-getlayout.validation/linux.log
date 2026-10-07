@@ -1,0 +1,105 @@
+=== [1/2] 语法与多架构编译检查 ===
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.08s
+=== [2/2] 在隔离的 D-Bus 会话中运行 Linux 模块测试 ===
+   Compiling uda-platform-linux v0.1.0 (/tmp/kotofox-work/uda/crates/uda-platform-linux)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.84s
+     Running unittests src/lib.rs (target/debug/deps/uda_platform_linux-acb5584d5c9aa3f7)
+
+running 83 tests
+test detection::tests::env_gnome ... ok
+test detection::tests::env_unknown ... ok
+test detection::tests::env_xorg ... ok
+test detection::tests::env_wayland ... ok
+test detection::tests::env_kde ... ok
+test media::tests::a_dictionary_with_only_a_duration_is_still_information ... ok
+test media::tests::a_negative_length_is_rejected_rather_than_wrapped ... ok
+test media::tests::a_full_metadata_dictionary_is_parsed ... ok
+test media::tests::a_single_artist_keeps_its_name_verbatim ... ok
+test media::tests::a_single_artist_string_still_yields_one_entry ... ok
+test media::tests::a_title_array_uses_its_first_element ... ok
+test media::tests::a_title_of_the_wrong_type_is_not_an_error ... ok
+test media::tests::a_title_string_is_taken_as_is ... ok
+test media::tests::a_zero_length_is_a_live_stream_not_a_zero_ms_track ... ok
+test media::tests::an_artist_array_is_read_fully ... ok
+test media::tests::an_empty_artist_list_is_not_an_error ... ok
+test media::tests::an_empty_dictionary_yields_empty_fields_not_an_error ... ok
+test media::tests::an_empty_title_array_yields_an_empty_string ... ok
+test media::tests::an_unknown_status_string_degrades_rather_than_guessing ... ok
+test media::tests::artists_are_joined_for_display ... ok
+test media::tests::blank_artist_entries_are_dropped ... ok
+test media::tests::capabilities_report_media_control ... ok
+test media::tests::commands_map_to_the_mpris_method_names ... ok
+test media::tests::microseconds_convert_to_milliseconds ... ok
+test media::tests::status_strings_map_onto_the_core_enum ... ok
+test notification::tests::actions_empty ... ok
+test notification::tests::actions_flattening ... ok
+test notification::tests::notification_default_empty_body ... ok
+test notification::tests::notification_default_has_zero_replaces_id ... ok
+test notification::tests::notification_urgency_hint_is_omitted_for_low ... ok
+test notification::tests::notification_urgency_hint_is_sent_for_normal ... ok
+test session::tests::a_generic_failure_is_a_command_failure ... ok
+test session::tests::a_polkit_refusal_is_reported_as_unsupported ... ok
+test session::tests::an_operation_the_machine_lacks_is_unsupported ... ok
+
+thread '<unnamed>' (875315) panicked at crates/uda-platform-linux/src/tray.rs:1936:13:
+poison the tray lock on purpose
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test session::tests::an_unauthorized_refusal_is_recognised_by_the_cli_tier_too ... ok
+test session::tests::capabilities_cover_every_action ... ok
+test session::tests::every_destructive_action_maps_to_a_login1_method ... ok
+test session::tests::lock_has_no_login1_method_because_it_uses_the_session_bus ... ok
+test session::tests::shutdown_maps_to_poweroff_not_to_a_shutdown_verb ... ok
+test session::tests::the_core_guard_accepts_every_action_this_backend_advertises ... ok
+test tray::tests::a_fully_transparent_pixel_keeps_its_colour_channels ... ok
+test tray::tests::a_menu_without_rows_still_encodes ... ok
+test tray::tests::a_path_icon_becomes_a_theme_name ... ok
+test tray::tests::a_snapshot_without_a_menu_is_none ... ok
+test tray::tests::a_single_property_read_is_reported_absent_when_unknown ... ok
+test tray::tests::a_worker_sees_the_host_drop_as_shutdown ... ok
+test tray::tests::advertised_capabilities_omit_double_click ... ok
+test tray::tests::an_event_is_addressed_by_id ... ok
+test tray::tests::an_invalid_icon_degrades_instead_of_panicking ... ok
+test tray::tests::a_poisoned_lock_is_recovered_rather_than_propagated ... ok
+test tray::tests::bus_names_are_unique_and_sanitised ... ok
+test tray::tests::conversion_rejects_inconsistent_buffers ... ok
+test tray::tests::conversion_skips_stride_padding ... ok
+test tray::tests::dbusmenu_ids_are_allocated_contiguously ... ok
+test tray::tests::group_properties_filters_to_the_requested_names ... ok
+test tray::tests::red_and_blue_are_not_swapped ... ok
+test tray::tests::menu_rows_carry_the_documented_properties ... ok
+test tray::tests::rgba_is_converted_to_bottom_up_bgra ... ok
+test tray::tests::support_level_is_honest ... ok
+test tray::tests::the_double_click_window_is_half_a_second ... ok
+test tray::tests::the_item_snapshot_reflects_visibility ... ok
+test tray::tests::the_manager_does_not_touch_the_bus_until_created ... ok
+test tray::tests::the_menu_path_matches_the_specification ... ok
+test tray::tests::the_owned_properties_round_trip_through_a_variant ... ok
+test tray::tests::the_state_mirror_tracks_host_updates ... ok
+test tray::tests::the_worker_state_is_shared_across_clones ... ok
+test tray::tests::two_activations_inside_the_window_produce_a_double_click ... ok
+test wakelock::tests::guard_manual_release ... ok
+test wakelock::tests::guard_runs_release_on_drop ... ok
+test wakelock::tests::wake_lock_type_flags ... ok
+test wallpaper::tests::file_uri_preserves_existing_uri ... ok
+test wallpaper::tests::file_uri_encodes_special_characters ... ok
+test wallpaper::tests::file_uri_with_spaces ... ok
+test wallpaper::tests::hyprland_command_with_monitor ... ok
+test wallpaper::tests::kde_script_fill_mode_mapping ... ok
+test wallpaper::tests::kde_script_fit_maps_to_wallpaper_fill_mode ... ok
+test tray::tests::the_layout_root_carries_id_zero ... ok
+test wallpaper::tests::nitrogen_defaults_to_head_zero ... ok
+test wallpaper::tests::swww_args_include_output_when_monitor_set ... ok
+test wallpaper::tests::x11_fallback_chain_priority ... ok
+test tray::tests::layout_matches_the_dbusmenu_wire_signature ... ok
+test media::tests::a_headless_session_has_no_player_and_reports_none ... ok
+test tray::tests::get_layout_survives_session_bus_transport ... ok
+
+test result: ok. 83 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+   Doc-tests uda_platform_linux
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+=== 所有的测试检查均已通过！===

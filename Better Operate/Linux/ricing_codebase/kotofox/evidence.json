@@ -1,0 +1,288 @@
+{
+  "date": "2026-10-05",
+  "name": "Kotofox",
+  "version": "0.1.0",
+  "target": "Fedora 44 · KDE Wayland · x86_64 · Qt 6.11",
+  "state": {
+    "ok": true,
+    "manager_running": true,
+    "session": "musicfox",
+    "player_running": true,
+    "terminal_pid": 892357,
+    "lyrics_visible": true,
+    "layer_shell_active": true,
+    "qt_platform": "wayland",
+    "tray_backend": "UniDesktop StatusNotifierItem",
+    "config": "/home/pi/.config/kotofox/lyrics.json"
+  },
+  "package": {
+    "path": "/home/pi/work/OsCookbook/Better Operate/Linux/ricing_codebase/kotofox/.packages/kotofox-0.1.0-fedora44-x86_64.tar.gz",
+    "bytes": 17470977,
+    "sha256": "6f121bb7e2de8f4a67300d7a82bd05ae246f1399623d1a0d3b46bc8903fc3128"
+  },
+  "provenance": {
+    "version": "0.1.0",
+    "target": "Fedora 44 KDE Wayland x86_64 / system Qt 6.11",
+    "uda_source": "https://github.com/yceachan/SDK.git",
+    "uda_commit": "622436a3d665fdd9cfe769fc85b049eadcd38e65",
+    "kotonoha_commit": "175cfcc04ffb67fbbba26c76437275083090233a",
+    "kotonoha_version": "0.2.3",
+    "musicfox_version": "5.1.0",
+    "musicfox_source": "https://github.com/go-musicfox/go-musicfox/tree/v5.1.0",
+    "sha256": {
+      "bin/musicfox": "d5857d8a1361a77afbb7851ad947e32bf8d165db66edb4a9ff1c2b39d4db74f2",
+      "lib/libuda_ffi.so": "ef962a69870064a1ddb4df0cb7b15f4c82c80f7c4bea65c1a86962be5ee06910",
+      "vendor/kotonoha/libkoto-layer.so": "acb20c120b4768b11b2e2142a0e6e19d3cdaf1e8c26ba853a5dcc3544b7ba3cb",
+      "src/lyrics.py": "c48d1e941566e455db547e6ba3b965be4de69422e7d0759470aa6bf58501f0fa",
+      "src/main.py": "6563e574b45c8e50ec6ade651514e36ffa1ae84776efcdb44a2d32fe75ea8c48",
+      "src/player.py": "1aa342fab91c6a8ab2b5f687c20bd9ec87db2d7a9bfde33323f5caddaf1a7e91",
+      "src/tray.py": "bd1dbfef00fcd94f7a10da50eedd91d9a9832a568616d5654dd2522743a7b51b",
+      "assets/kotofox.svg": "d821491a883932df3c8baa6a5426f206c0d9d9b2c4675c0f88c52ad79ebba93d",
+      "src/focus-player.js": "a7703a845dcc30cd6e9c74484e5d290fe8683e967aec8c23ce104bdb3a3e50d7",
+      "src/kwin_rules.py": "d52f08327936b01719728f9f2f161e47bbf975b0145e17f07d66d3b56ecb2317"
+    }
+  },
+  "checks": [
+    {
+      "name": "置顶歌词层",
+      "detail": "KDE Wayland 的歌词层已启用。Kotonoha 解析到当前歌曲的同步歌词。",
+      "passed": true
+    },
+    {
+      "name": "真实托盘菜单",
+      "detail": "Menu 属性返回对象路径 o。KDE 原生右键菜单显示 13 项。歌词显示、隐藏及窗口关闭、重开的菜单接口回调通过。",
+      "passed": true
+    },
+    {
+      "name": "并发打开",
+      "detail": "四个打开请求保留同一个 Ghostty 进程。KWin 只记录到一个播放器窗口。",
+      "passed": true
+    },
+    {
+      "name": "关闭与恢复窗口",
+      "detail": "关闭 Ghostty 窗口及通过托盘关闭窗口后，Musicfox 进程仍为 7209。恢复窗口继续使用原会话。",
+      "passed": true
+    },
+    {
+      "name": "原快捷键",
+      "detail": "在新建的 tmux 客户端按 Ctrl+Z，客户端正常脱离 musicfox 会话。",
+      "passed": true
+    },
+    {
+      "name": "任务栏身份",
+      "detail": "KWin 报告 desktopFileName=kotofox。主任务栏已加入 Kotofox 启动项。",
+      "passed": true
+    },
+    {
+      "name": "歌词设置",
+      "detail": "设置窗口和管理窗口都能打开，应用标识均为 kotofox。",
+      "passed": true
+    },
+    {
+      "name": "隔离会话测试",
+      "detail": "三项测试通过：重复启动、停止时保留其他会话、执行文件缺失时报错。",
+      "passed": true
+    },
+    {
+      "name": "SDK 检查",
+      "detail": "编译、格式与 Clippy 检查通过。Linux 83 项测试、FFI 89 项测试通过。新增总线测试在原版失败，在候选提交通过。",
+      "passed": true
+    }
+  ],
+  "menu_labels": [
+    "打开播放器",
+    "关闭播放器窗口，保留播放",
+    "显示桌面歌词",
+    "隐藏桌面歌词",
+    "歌词穿透：开",
+    "歌词穿透：关",
+    "歌词设置",
+    "Kotofox 管理",
+    "播放 / 暂停",
+    "上一首",
+    "下一首",
+    "退出 Kotofox，保留播放",
+    "退出并停止播放器"
+  ],
+  "fixes": [
+    {
+      "name": "UniDesktop 菜单格式",
+      "before": "错误的菜单结构包含空 D-Bus 结构，读取菜单后托盘连接中断。",
+      "after": "菜单节点改为 (ia{sv}av)，Menu 属性改为对象路径。构建脚本固定提交 622436a，KDE 原生菜单已显示。"
+    },
+    {
+      "name": "Kotonoha 的 Qt 版本",
+      "before": "本机原生库按 Qt 6.10 编译，拒绝启用 Qt 6.11 的歌词层。",
+      "after": "在 /tmp 解包开发头文件，重编译包内原生库。系统 Qt 与原安装保持原样。"
+    }
+  ],
+  "commands": {
+    "打开播放器": "kotofox open",
+    "打开管理窗口": "kotofox manage",
+    "检查状态": "kotofox status",
+    "读取日志": "journalctl --user -u kotofox.service"
+  },
+  "scope": "这是当前机器的功能原型。包内含两个应用和托盘库，运行时复用本机 Python、Qt、Ghostty 与 tmux。跨机器安装和回滚流程在功能审阅后处理。",
+  "sdk_validation": {
+    "commit": "622436a3d665fdd9cfe769fc85b049eadcd38e65",
+    "checks": {
+      "workspace_check": true,
+      "linux_tests": 83,
+      "ffi_tests": 89,
+      "fmt": true,
+      "clippy_deny_warnings": true,
+      "release_build": true,
+      "package_build": true
+    },
+    "baseline_transport_error": "org.freedesktop.DBus.Error.NoReply: Message recipient disconnected from message bus without replying",
+    "candidate_transport_test_passed": true,
+    "e2e": {
+      "sdk_commit": "622436a3d665fdd9cfe769fc85b049eadcd38e65",
+      "library_sha256": "ef962a69870064a1ddb4df0cb7b15f4c82c80f7c4bea65c1a86962be5ee06910",
+      "library_mapped_in_manager": true,
+      "manager_pid": 878880,
+      "signature": "u(ia{sv}av)",
+      "menu_property_signature": "o",
+      "menu_path": "/MenuBar",
+      "service": "org.kde.StatusNotifierItem-Kotofox-878880-0",
+      "menu_labels": [
+        "打开播放器",
+        "关闭播放器窗口，保留播放",
+        "显示桌面歌词",
+        "隐藏桌面歌词",
+        "歌词穿透：开",
+        "歌词穿透：关",
+        "歌词设置",
+        "Kotofox 管理",
+        "播放 / 暂停",
+        "上一首",
+        "下一首",
+        "退出 Kotofox，保留播放",
+        "退出并停止播放器"
+      ],
+      "show_hide_callbacks": true,
+      "close_reopen_callbacks": true,
+      "name_has_owner_after_callbacks": true,
+      "kotofox_tray_count": 1,
+      "bare_kotonoha_tray_absent": true,
+      "player_pid_before": 7209,
+      "player_pid_after": 7209,
+      "state": {
+        "ok": true,
+        "manager_running": true,
+        "session": "musicfox",
+        "player_running": true,
+        "terminal_pid": 878998,
+        "lyrics_visible": true,
+        "layer_shell_active": true,
+        "qt_platform": "wayland",
+        "tray_backend": "UniDesktop StatusNotifierItem",
+        "config": "/home/pi/.config/kotofox/lyrics.json"
+      },
+      "native_context_menu_visible": true,
+      "native_context_menu_item_count": 13,
+      "native_context_menu_screenshot": "/tmp/kotofox-screenshot/kotofox-tray-check.png",
+      "native_context_menu_screenshot_sha256": "621d878ae6a3d2cf9c8c045b7b8c679fd7c850b6406987991e7f6f1629fe73c9"
+    },
+    "draft_pr": "https://github.com/UniDesktop/SDK/pull/3",
+    "menu_discovery_baseline": {
+      "commit": "a7b8adef21fb8d80f766535303839e7518cae334",
+      "actual_type": "s",
+      "required_type": "o",
+      "regression_test_failed": true
+    }
+  },
+  "terminal_validation": {
+    "terminal": "Ghostty",
+    "concurrent_open_requests": 4,
+    "concurrent_open_pid": 891766,
+    "window_count": 1,
+    "restore_minimized_same_pid": true,
+    "native_window_close_keeps_player": true,
+    "detach_reopen_keeps_player": true,
+    "player_pid_before": 7209,
+    "player_pid_after": 7209,
+    "other_ghostty_pids_before": [
+      547230,
+      591891,
+      673753
+    ],
+    "other_ghostty_pids_after": [
+      547230,
+      591891,
+      673753
+    ],
+    "ghostty_config_unchanged": true,
+    "focus_script_unloaded": true,
+    "windows": [
+      {
+        "caption": "Kotofox",
+        "resourceClass": "com.mitchellh.ghostty.kotofox",
+        "desktopFileName": "kotofox",
+        "keepAbove": false,
+        "skipTaskbar": false,
+        "pid": 892357
+      }
+    ],
+    "state": {
+      "ok": true,
+      "manager_running": true,
+      "session": "musicfox",
+      "player_running": true,
+      "terminal_pid": 892357,
+      "lyrics_visible": true,
+      "layer_shell_active": true,
+      "qt_platform": "wayland",
+      "tray_backend": "UniDesktop StatusNotifierItem",
+      "config": "/home/pi/.config/kotofox/lyrics.json"
+    },
+    "tray_callbacks": {
+      "sdk_commit": "622436a3d665fdd9cfe769fc85b049eadcd38e65",
+      "library_sha256": "ef962a69870064a1ddb4df0cb7b15f4c82c80f7c4bea65c1a86962be5ee06910",
+      "library_mapped_in_manager": true,
+      "manager_pid": 891738,
+      "signature": "u(ia{sv}av)",
+      "menu_property_signature": "o",
+      "menu_path": "/MenuBar",
+      "service": "org.kde.StatusNotifierItem-Kotofox-891738-0",
+      "menu_labels": [
+        "打开播放器",
+        "关闭播放器窗口，保留播放",
+        "显示桌面歌词",
+        "隐藏桌面歌词",
+        "歌词穿透：开",
+        "歌词穿透：关",
+        "歌词设置",
+        "Kotofox 管理",
+        "播放 / 暂停",
+        "上一首",
+        "下一首",
+        "退出 Kotofox，保留播放",
+        "退出并停止播放器"
+      ],
+      "show_hide_callbacks": true,
+      "close_reopen_callbacks": true,
+      "name_has_owner_after_callbacks": true,
+      "kotofox_tray_count": 1,
+      "bare_kotonoha_tray_absent": true,
+      "player_pid_before": 7209,
+      "player_pid_after": 7209,
+      "state": {
+        "ok": true,
+        "manager_running": true,
+        "session": "musicfox",
+        "player_running": true,
+        "terminal_pid": 892357,
+        "lyrics_visible": true,
+        "layer_shell_active": true,
+        "qt_platform": "wayland",
+        "tray_backend": "UniDesktop StatusNotifierItem",
+        "config": "/home/pi/.config/kotofox/lyrics.json"
+      }
+    },
+    "kwin_rules_preserved": true,
+    "kwin_rule_install_idempotent": true,
+    "test_script": "/tmp/kotofox-ghostty/e2e.py",
+    "window_focus_source": "src/focus-player.js"
+  }
+}

@@ -1,0 +1,22 @@
+   Compiling uda-core v0.1.0 (/tmp/kotofox-build.zlMnAV/uda/crates/uda-core)
+   Compiling uda-platform-linux v0.1.0 (/tmp/kotofox-build.zlMnAV/uda/crates/uda-platform-linux)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.29s
+     Running unittests src/lib.rs (/tmp/kotofox-issue/uda-clean/target/debug/deps/uda_platform_linux-acb5584d5c9aa3f7)
+
+running 1 test
+
+thread 'tray::tests::get_layout_survives_session_bus_transport' (875050) panicked at crates/uda-platform-linux/src/tray.rs:1675:9:
+assertion `left == right` failed
+  left: "s"
+ right: "o"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test tray::tests::get_layout_survives_session_bus_transport ... FAILED
+
+failures:
+
+failures:
+    tray::tests::get_layout_survives_session_bus_transport
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 82 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p uda-platform-linux --lib`

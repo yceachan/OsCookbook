@@ -1,0 +1,25 @@
+[Desktop Entry]
+Type=Application
+Name=Kotofox
+GenericName=Music Player
+Comment=Musicfox tmux player and desktop lyrics
+Exec=@ROOT@/kotofox open
+Icon=kotofox
+Terminal=false
+Categories=AudioVideo;Audio;Player;
+Keywords=musicfox;kotonoha;music;lyrics;tmux;
+StartupNotify=false
+StartupWMClass=com.mitchellh.ghostty.kotofox
+Actions=Manage;Lyrics;HideLyrics;
+
+[Desktop Action Manage]
+Name=Kotofox 管理
+Exec=@ROOT@/kotofox manage
+
+[Desktop Action Lyrics]
+Name=显示桌面歌词
+Exec=@ROOT@/kotofox lyrics-on
+
+[Desktop Action HideLyrics]
+Name=隐藏桌面歌词
+Exec=@ROOT@/kotofox lyrics-off

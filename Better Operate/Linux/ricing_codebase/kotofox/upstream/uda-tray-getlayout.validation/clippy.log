@@ -1,0 +1,4 @@
+    Checking uda-platform-linux v0.1.0 (/tmp/kotofox-work/uda/crates/uda-platform-linux)
+    Checking uda-ffi v0.1.0 (/tmp/kotofox-work/uda/crates/uda-ffi)
+    Checking uda-cli v0.1.0 (/tmp/kotofox-work/uda/crates/uda-cli)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.45s

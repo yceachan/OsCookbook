@@ -1,0 +1,4 @@
+introspection: .GetLayout                          method    iias            u(ia{sv}av)  -
+GetLayout exit: 0
+u(ia{sv}av) 1 0 0 1 (ia{sv}av) 1 4 "enabled" b true "label" s "Open" "type" s "standard" "visible" b true 0
+NameHasOwner: b true

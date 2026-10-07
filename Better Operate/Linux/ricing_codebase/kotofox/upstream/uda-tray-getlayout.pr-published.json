@@ -1,0 +1,9 @@
+{
+  "headRefOid": "622436a3d665fdd9cfe769fc85b049eadcd38e65",
+  "isDraft": false,
+  "state": "OPEN",
+  "title": "修正 Linux 托盘菜单的发现与数据格式",
+  "url": "https://github.com/UniDesktop/SDK/pull/3",
+  "body_source": "uda-tray-getlayout.pr-draft.md",
+  "body_sha256": "6b2f2dea6295e9c51b5eaef2fe360f2377ffa8876f5b32aa30e4751994e4bb8d"
+}

@@ -1,0 +1,16 @@
+{
+  "pane_pid": 7209,
+  "manager_pid": 807664,
+  "state": {
+    "ok": true,
+    "manager_running": true,
+    "session": "musicfox",
+    "player_running": true,
+    "terminal_pid": 807923,
+    "lyrics_visible": true,
+    "layer_shell_active": true,
+    "qt_platform": "wayland",
+    "tray_backend": "UniDesktop StatusNotifierItem",
+    "config": "/home/pi/.config/kotofox/lyrics.json"
+  }
+}

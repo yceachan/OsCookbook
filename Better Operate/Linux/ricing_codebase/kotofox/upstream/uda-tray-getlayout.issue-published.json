@@ -1,0 +1,12 @@
+{
+  "title": "Linux 托盘：GetLayout 返回错误的数据格式，读取菜单后连接断开",
+  "url": "https://github.com/UniDesktop/SDK/issues/2",
+  "state": "OPEN",
+  "author": {
+    "id": "U_kgDOBnKOWA",
+    "is_bot": false,
+    "login": "yceachan",
+    "name": "Ea Chan"
+  },
+  "body_sha256": "bc73d3fdd9f5486dbe186186c818c4660ae58bf5b699e3f07a7e27eb7d6a95a8"
+}

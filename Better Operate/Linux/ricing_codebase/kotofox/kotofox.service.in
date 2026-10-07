@@ -1,0 +1,14 @@
+[Unit]
+Description=Kotofox music and desktop lyrics manager
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 -s @ROOT@/src/main.py --daemon
+Restart=on-failure
+RestartSec=2
+TimeoutStopSec=15
+# A tmux server started here must survive the manager stopping.
+KillMode=process
+

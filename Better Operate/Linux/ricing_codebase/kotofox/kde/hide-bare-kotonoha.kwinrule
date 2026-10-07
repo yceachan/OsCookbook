@@ -1,0 +1,11 @@
+[General]
+count=1
+rules=kotofox-hide-bare-kotonoha
+
+[kotofox-hide-bare-kotonoha]
+Description=Hide standalone Kotonoha from taskbar
+wmclass=kotonoha
+wmclasscomplete=false
+wmclassmatch=1
+skiptaskbar=true
+skiptaskbarrule=2
