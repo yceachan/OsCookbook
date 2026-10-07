@@ -1,0 +1,153 @@
+/* Typora editor adaptation. Reading colors and typography are generated from markdown.css. */
+:root {
+  --bg-color: var(--kb-surface);
+  --text-color: var(--kb-text);
+  --md-char-color: var(--kb-text-subtle);
+  --meta-content-color: var(--kb-text-muted);
+  --primary-color: var(--kb-accent);
+  --primary-btn-border-color: var(--kb-accent);
+  --primary-btn-text-color: var(--kb-surface);
+  --side-bar-bg-color: var(--kb-surface-alt);
+  --control-text-color: var(--kb-text-muted);
+  --control-text-hover-color: var(--kb-accent);
+  --window-border: 1px solid var(--kb-line);
+  --panel-border-color: var(--kb-line);
+  --active-file-bg-color: var(--kb-accent-soft);
+  --active-file-text-color: var(--kb-accent);
+  --active-file-border-color: var(--kb-accent);
+  --item-hover-bg-color: var(--kb-accent-faint);
+  --item-hover-text-color: var(--kb-accent);
+  --select-text-bg-color: var(--kb-accent-soft);
+  --select-text-font-color: var(--kb-text);
+  --focus-ring-color: var(--kb-accent);
+  --blur-text-color: var(--kb-text-subtle);
+  --monospace: var(--kb-font-mono);
+}
+
+html {
+  font-size: 16px;
+  font-family: var(--kb-font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: var(--kb-font-sans);
+  line-height: 1.82;
+  caret-color: var(--kb-accent);
+}
+
+/* Match the reader's fluid column; Typora owns scrolling and window layout. */
+#write {
+  width: 100%;
+  max-width: none;
+  padding: 32px clamp(24px, 5%, 120px) 50px;
+}
+
+#write figure > table {
+  margin: 0;
+}
+
+#write .md-meta-block {
+  margin: 0 0 24px;
+}
+
+#write .md-fences,
+#write .md-meta-block,
+#typora-source .CodeMirror {
+  font-family: var(--kb-font-mono);
+}
+
+.cm-s-inner {
+  background: transparent;
+  color: var(--kb-text);
+  font-family: var(--kb-font-mono);
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.CodeMirror-gutters {
+  background: transparent;
+  border-right: 0;
+}
+
+.CodeMirror-linenumber {
+  color: var(--kb-text-subtle);
+}
+
+.CodeMirror-cursor {
+  border-left-color: var(--kb-accent);
+}
+
+.CodeMirror div.CodeMirror-selected,
+.CodeMirror-focused div.CodeMirror-selected {
+  background: var(--kb-accent-soft);
+}
+
+#write .md-fences code {
+  font-family: inherit;
+}
+
+#write .md-alert .md-alert-text {
+  font-size: 1rem;
+}
+
+#write .md-toc {
+  font-family: var(--kb-font-sans);
+}
+
+#write .md-toc-item {
+  color: var(--kb-text-muted);
+}
+
+#write .md-toc a:hover {
+  color: var(--kb-accent);
+}
+
+#write mark {
+  background: var(--kb-accent-soft);
+  color: inherit;
+}
+
+#write sup.md-footnote {
+  background: var(--kb-accent-faint);
+  color: var(--kb-accent);
+}
+
+#typora-sidebar {
+  border-right: 1px solid var(--kb-line);
+}
+
+#typora-source .CodeMirror-lines {
+  max-width: none;
+  padding: 32px clamp(24px, 5%, 120px) 50px;
+}
+
+.cm-s-typora-default .cm-header {
+  color: var(--kb-accent);
+}
+
+.cm-s-typora-default .cm-link {
+  color: var(--kb-accent);
+}
+
+@media print {
+  #write {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  #write .md-fences,
+  #write .md-meta-block,
+  #write blockquote,
+  #write .md-alert {
+    break-inside: avoid;
+  }
+
+  #write [lang="mermaid"] .md-diagram-panel {
+    overflow: visible;
+  }
+
+  #write [lang="mermaid"] .md-diagram-panel svg {
+    max-width: 100%;
+  }
+}

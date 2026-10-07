@@ -1,0 +1,17 @@
+{
+  "name": "typora-ea-reader",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "build": "node scripts/build-theme.mjs"
+  },
+  "devDependencies": {
+    "postcss": "8.5.28",
+    "shiki": "4.5.0"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

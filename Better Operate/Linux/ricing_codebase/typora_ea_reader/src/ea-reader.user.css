@@ -1,0 +1,14 @@
+
+
+@media print { .page-break { break-after: page; page-break-after: always; } }
+@media print { img, table, pre, blockquote { break-inside: avoid; page-break-inside: avoid; } }
+@media print {
+    #write hr {
+        break-after: page;
+        page-break-after: always;
+        visibility: hidden;
+        height: 0;
+        margin: 0;
+        border: 0;
+    }
+}
