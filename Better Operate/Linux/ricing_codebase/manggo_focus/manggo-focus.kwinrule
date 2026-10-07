@@ -1,0 +1,35 @@
+# 这些数字由各个字段分别定义，不能共用一张“0=关、1=开”的取值表。
+# 定义依据：KWin Plasma/6.7 的 src/rules.h、src/rules.cpp、src/options.h。
+# https://github.com/KDE/kwin/blob/Plasma/6.7/src/rules.h
+# https://github.com/KDE/kwin/blob/Plasma/6.7/src/rules.cpp
+# https://github.com/KDE/kwin/blob/Plasma/6.7/src/options.h
+
+[General]
+# 此导入文件包含一条规则。合并到本机配置后，count 要计入其他已有规则。
+count=1
+# 规则组的索引，值必须对应下面的组名。多条规则用逗号分隔。
+rules=manggo-focus-activation
+
+# 此规则的标识符，供 General.rules 引用。
+[manggo-focus-activation]
+# 显示在 KWin 设置界面中的名称，不参与窗口匹配。
+Description=Manggo shortcut window activation
+# 待匹配的窗口类名。本机实测 Manggo 的 resourceClass 为此值。
+wmclass=com.pylogmon.Manggo
+# false：只匹配 resourceClass；true：匹配“resourceName 空格 resourceClass”。
+# 此字段决定匹配对象，下面的 wmclassmatch 决定匹配方式。
+wmclasscomplete=false
+# 字符串匹配方式：0=不限制此字段，1=完全匹配，2=子串匹配，3=正则表达式。
+# 这里使用完全匹配，避免影响类名只是包含 Manggo 的其他应用。
+wmclassmatch=1
+# 焦点抢占防护等级：0=无，1=低，2=中，3=高，4=极高。
+# 这里选 0：允许匹配窗口请求激活。应用仍须主动发出激活请求。
+# 此值不会让窗口始终置顶，也不会为应用设置快捷键。
+fsplevel=0
+# 属性的执行方式：0=未使用，1=不影响，2=强制，6=临时强制。
+# 0 跳过本条规则的此属性，后续匹配规则仍可设置它。
+# 1 保留已有值，并阻止后续匹配规则设置此属性。
+# 2 持续使用上面的 fsplevel 值；6 在窗口撤下后丢弃此属性规则。
+# 通用执行枚举还有 3=初始应用、4=记住、5=立即应用，但 fsplevel 不支持它们。
+# fsplevelrule=2 与 fsplevel=0 合起来表示：强制关闭此应用的焦点抢占防护。
+fsplevelrule=2
