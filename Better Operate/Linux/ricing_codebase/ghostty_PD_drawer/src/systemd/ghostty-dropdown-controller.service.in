@@ -5,7 +5,6 @@ After=graphical-session.target
 
 [Service]
 Type=simple
-Environment=GHOSTTY_PD_DRAWER_KWRITECONFIG=@KWRITECONFIG_BIN@
 Environment=GHOSTTY_PD_DRAWER_GHOSTTY=@GHOSTTY_BIN@
 Environment=GHOSTTY_PD_DRAWER_RUNTIME_DIR=@RUNTIME_DIR@/ghostty-pd-drawer
 Environment=GHOSTTY_PD_DRAWER_CONFIG=@CONFIG_HOME@/ghostty/dropdown.ghostty

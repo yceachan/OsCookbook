@@ -13,6 +13,10 @@
 ZDOTDIR=@USER_ZDOTDIR@
 [[ -r @USER_ZDOTDIR@/.zshrc ]] && source @USER_ZDOTDIR@/.zshrc
 
+# ESC is also the prefix of arrow/Alt key sequences. ZLE's default 40 waits
+# 400 ms before dispatching a lone ESC; 2 keeps a 20 ms sequence window.
+KEYTIMEOUT=2
+
 function _ghostty_pd_drawer_hide() {
     (( $+commands[gdbus] )) || return 0
     [[ -n ${GHOSTTY_PD_DRAWER_INSTANCE-} ]] || return 0

@@ -24,14 +24,13 @@ log = logging.getLogger("ghostty-pd-drawer")
 BUS_NAME = "com.mitchellh.ghostty.DropdownController"
 OBJECT_PATH = "/com/mitchellh/ghostty/DropdownController"
 INTERFACE = BUS_NAME
-RULE_GROUP = "ghostty-dropdown-initial"
-KWRITECONFIG = os.environ["GHOSTTY_PD_DRAWER_KWRITECONFIG"]
 GHOSTTY = os.environ["GHOSTTY_PD_DRAWER_GHOSTTY"]
 RUNTIME_DIR = pathlib.Path(os.environ["GHOSTTY_PD_DRAWER_RUNTIME_DIR"])
 DRAWER_CONFIG = pathlib.Path(os.environ["GHOSTTY_PD_DRAWER_CONFIG"])
 DEFAULT_CONFIG = pathlib.Path(os.environ["GHOSTTY_PD_DRAWER_DEFAULT_CONFIG"])
 DEFAULT_CONFIG_GHOSTTY = pathlib.Path(os.environ["GHOSTTY_PD_DRAWER_DEFAULT_CONFIG_GHOSTTY"])
 CURRENT_STATE = RUNTIME_DIR / "current"
+APP_ID = "com.mitchellh.ghostty.dropdown"
 
 # Registered by the KWin script without a key. The drawer shell prompts the
 # controller to hide the window through this shortcut so no window state has to
@@ -44,12 +43,7 @@ KGLOBALACCEL_INTERFACE = "org.kde.kglobalaccel.Component"
 INTROSPECTION_XML = f"""
 <node>
   <interface name="{INTERFACE}">
-    <method name="Start">
-      <arg type="i" name="x" direction="in"/>
-      <arg type="i" name="y" direction="in"/>
-      <arg type="i" name="width" direction="in"/>
-      <arg type="i" name="height" direction="in"/>
-    </method>
+    <method name="Start"/>
     <method name="Promote">
       <arg type="i" name="width" direction="in"/>
       <arg type="i" name="height" direction="in"/>
@@ -62,6 +56,7 @@ INTROSPECTION_XML = f"""
     <method name="Refresh"/>
     <method name="Register">
       <arg type="i" name="pid" direction="in"/>
+      <arg type="b" name="current" direction="out"/>
     </method>
     <method name="IsCurrent">
       <arg type="i" name="pid" direction="in"/>
@@ -70,13 +65,6 @@ INTROSPECTION_XML = f"""
   </interface>
 </node>
 """
-
-
-def write_rule_value(key, value):
-    subprocess.run(
-        [KWRITECONFIG, "--file", "kwinrulesrc", "--group", RULE_GROUP, "--key", key, str(value)],
-        check=True,
-    )
 
 
 def read_state():
@@ -250,7 +238,7 @@ def resolve_config(sources):
 
 
 def write_instance_config(path, include_drawer):
-    """Write the per-instance config and return the resolved configuration.
+    """Write the per-instance config and return its source files.
 
     The instance config stays a list of `config-file` includes instead of a
     flattened dump: `ghostty +show-config` drops keybind attributes, so a
@@ -264,18 +252,53 @@ def write_instance_config(path, include_drawer):
 
     path.write_text("".join(f"config-file = {source}\n" for source in sources))
     path.chmod(0o600)
-    return resolve_config(sources)
+    return sources
 
 
-def start_ghostty(connection):
-    instance = f"{os.getpid()}-{time.monotonic_ns()}"
+def current_instance(connection):
+    try:
+        lines = read_state()
+    except FileNotFoundError:
+        return None
+    if len(lines) < 2:
+        raise ValueError("The active drawer state is incomplete")
+    unit, config_path = lines[:2]
+    try:
+        unit_path = connection.call_sync(
+            "org.freedesktop.systemd1", "/org/freedesktop/systemd1",
+            "org.freedesktop.systemd1.Manager", "GetUnit",
+            GLib.Variant("(s)", (unit,)), GLib.VariantType("(o)"),
+            Gio.DBusCallFlags.NONE, -1, None,
+        ).unpack()[0]
+    except GLib.Error as error:
+        if Gio.DBusError.get_remote_error(error) == "org.freedesktop.systemd1.NoSuchUnit":
+            return None
+        raise
+    active = connection.call_sync(
+        "org.freedesktop.systemd1", unit_path,
+        "org.freedesktop.DBus.Properties", "Get",
+        GLib.Variant("(ss)", ("org.freedesktop.systemd1.Unit", "ActiveState")),
+        GLib.VariantType("(v)"), Gio.DBusCallFlags.NONE, -1, None,
+    ).unpack()[0]
+    if active not in ("active", "activating", "reloading"):
+        return None
+    if pathlib.Path(config_path).parent != RUNTIME_DIR or not pathlib.Path(config_path).is_file():
+        raise ValueError("The active drawer config is missing or outside its runtime directory")
+    return unit.removeprefix("ghostty-dropdown@").removesuffix(".service")
+
+
+def warm_ghostty(connection, replace_legacy=False):
+    instance = current_instance(connection)
+    if instance is not None and (not replace_legacy or instance.startswith("i")):
+        return instance
+    instance = f"i{os.getpid()}_{time.monotonic_ns()}"
     unit = f"ghostty-dropdown@{instance}.service"
     instance_config = RUNTIME_DIR / f"{instance}.ghostty"
     RUNTIME_DIR.mkdir(mode=0o700, parents=True, exist_ok=True)
     write_instance_config(instance_config, include_drawer=True)
     CURRENT_STATE.write_text(f"{unit}\n{instance_config}\n")
     CURRENT_STATE.chmod(0o600)
-    connection.call(
+    connection.call_sync(
         "org.freedesktop.systemd1",
         "/org/freedesktop/systemd1",
         "org.freedesktop.systemd1.Manager",
@@ -285,8 +308,51 @@ def start_ghostty(connection):
         Gio.DBusCallFlags.NONE,
         -1,
         None,
-        None,
     )
+    return instance
+
+
+def activate_ghostty(connection, instance, invocation):
+    application = f"{APP_ID}.{instance}"
+    path = "/" + application.replace(".", "/")
+    pending = {"watch": None, "timeout": None}
+
+    def cleanup():
+        Gio.bus_unwatch_name(pending["watch"])
+        GLib.source_remove(pending["timeout"])
+
+    def activated(connection, result):
+        try:
+            connection.call_finish(result)
+        except GLib.Error as error:
+            invocation.return_dbus_error(BUS_NAME + ".ActivateFailed", str(error))
+        else:
+            invocation.return_value(None)
+
+    def appeared(connection, name, owner):
+        cleanup()
+        connection.call(
+            application, path, "org.freedesktop.Application", "Activate",
+            GLib.Variant("(a{sv})", ({},)), None,
+            Gio.DBusCallFlags.NO_AUTO_START, -1, None, activated,
+        )
+
+    def expired():
+        Gio.bus_unwatch_name(pending["watch"])
+        invocation.return_dbus_error(BUS_NAME + ".StartupFailed", "Ghostty did not acquire its D-Bus name within 25 seconds")
+        return GLib.SOURCE_REMOVE
+
+    pending["watch"] = Gio.bus_watch_name_on_connection(
+        connection, application, Gio.BusNameWatcherFlags.NONE, appeared, None,
+    )
+    pending["timeout"] = GLib.timeout_add_seconds(25, expired)
+
+
+def warm_next_drawer(connection):
+    try:
+        warm_ghostty(connection)
+    except (GLib.Error, OSError, ValueError):
+        log.exception("Failed to prewarm the next drawer")
     return GLib.SOURCE_REMOVE
 
 
@@ -303,7 +369,9 @@ def reload_ghostty(connection, include_drawer):
         raise ValueError("The active drawer config is missing or outside its runtime directory")
 
     temporary = config_path.with_suffix(".reloading")
-    flattened = write_instance_config(temporary, include_drawer=include_drawer)
+    sources = write_instance_config(temporary, include_drawer=include_drawer)
+    # Only promotion needs resolved values for the normal window's geometry.
+    config_text = resolve_config(sources) if not include_drawer else None
     temporary.replace(config_path)
     connection.call_sync(
         "org.freedesktop.systemd1",
@@ -316,7 +384,7 @@ def reload_ghostty(connection, include_drawer):
         -1,
         None,
     )
-    return flattened
+    return config_text
 
 
 def promote_ghostty(connection, frame_width, frame_height):
@@ -347,12 +415,27 @@ def hide_instance(connection, instance):
     )
 
 
-def register_pid(pid):
+def register_pid(connection, pid):
     lines = read_state()
     if len(lines) < 2:
         raise ValueError("The active drawer state is incomplete")
+    unit_path = connection.call_sync(
+        "org.freedesktop.systemd1", "/org/freedesktop/systemd1",
+        "org.freedesktop.systemd1.Manager", "GetUnit",
+        GLib.Variant("(s)", (lines[0],)), GLib.VariantType("(o)"),
+        Gio.DBusCallFlags.NONE, -1, None,
+    ).unpack()[0]
+    main_pid = connection.call_sync(
+        "org.freedesktop.systemd1", unit_path,
+        "org.freedesktop.DBus.Properties", "Get",
+        GLib.Variant("(ss)", ("org.freedesktop.systemd1.Service", "MainPID")),
+        GLib.VariantType("(v)"), Gio.DBusCallFlags.NONE, -1, None,
+    ).unpack()[0]
+    if pid != main_pid:
+        return False
     CURRENT_STATE.write_text(f"{lines[0]}\n{lines[1]}\n{pid}\n")
     CURRENT_STATE.chmod(0o600)
+    return True
 
 
 def is_current_pid(pid):
@@ -374,11 +457,11 @@ def handle_method_call(connection, sender, object_path, interface, method, param
 def dispatch_method_call(connection, method, parameters, invocation):
     if method == "Register":
         try:
-            register_pid(parameters.unpack()[0])
-        except (OSError, ValueError) as error:
+            current = register_pid(connection, parameters.unpack()[0])
+        except (GLib.Error, OSError, ValueError) as error:
             invocation.return_dbus_error(BUS_NAME + ".RegisterFailed", str(error))
             return
-        invocation.return_value(None)
+        invocation.return_value(GLib.Variant("(b)", (current,)))
         return
 
     if method == "IsCurrent":
@@ -404,6 +487,7 @@ def dispatch_method_call(connection, method, parameters, invocation):
             return
         # 0,0 tells the KWin script to keep its own default geometry.
         invocation.return_value(GLib.Variant("(ii)", size if size else (0, 0)))
+        GLib.idle_add(warm_next_drawer, connection)
         return
 
     if method == "Refresh":
@@ -419,32 +503,12 @@ def dispatch_method_call(connection, method, parameters, invocation):
         invocation.return_dbus_error(BUS_NAME + ".UnknownMethod", method)
         return
 
-    x, y, width, height = parameters.unpack()
-    if width < 1 or height < 1:
-        invocation.return_dbus_error(BUS_NAME + ".InvalidGeometry", "Invalid window size")
-        return
-
-    try:
-        write_rule_value("position", f"{x},{y}")
-        write_rule_value("size", f"{width},{height}")
-    except subprocess.CalledProcessError as error:
-        invocation.return_dbus_error(BUS_NAME + ".RuleWriteFailed", str(error))
-        return
-
-    connection.call(
-        "org.kde.KWin",
-        "/KWin",
-        "org.kde.KWin",
-        "reconfigure",
-        None,
-        None,
-        Gio.DBusCallFlags.NO_AUTO_START,
-        -1,
-        None,
-        None,
-    )
-    GLib.timeout_add(120, start_ghostty, connection)
-    invocation.return_value(None)
+    # GTK stays resident; Activate creates only a fresh window and shell.
+    # Existing pre-resident windows are preserved during apply. Once KWin
+    # requests a new window, move to a resident instance even if the old
+    # process is still finishing its shutdown.
+    instance = warm_ghostty(connection, replace_legacy=True)
+    activate_ghostty(connection, instance, invocation)
 
 
 def main():
@@ -452,6 +516,7 @@ def main():
     node = Gio.DBusNodeInfo.new_for_xml(INTROSPECTION_XML)
     connection.register_object(OBJECT_PATH, node.interfaces[0], handle_method_call, None, None)
     Gio.bus_own_name_on_connection(connection, BUS_NAME, Gio.BusNameOwnerFlags.NONE, None, None)
+    warm_ghostty(connection)
     GLib.MainLoop().run()
 
 

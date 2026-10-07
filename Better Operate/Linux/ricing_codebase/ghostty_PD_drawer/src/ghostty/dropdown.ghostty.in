@@ -10,11 +10,14 @@ gtk-titlebar = false
 gtk-titlebar-style = native
 window-show-tab-bar = never
 
-# KWin owns the drawer geometry; do not let Ghostty's configured window size
-# (window-width/window-height from the user's config) fight the KWin window rule.
+# KWin owns the drawer geometry and reveals the window after the resize is
+# acknowledged. Do not inherit the normal terminal's initial grid size.
 window-width = 0
 window-height = 0
 
-gtk-single-instance = false
+# Keep GTK ready after exit closes a shell/window. Promotion removes this
+# override, restoring the main configuration's process lifetime.
+gtk-single-instance = true
+quit-after-last-window-closed = false
 keybind = ctrl+shift+n=unbind
 keybind = ctrl+shift+t=unbind

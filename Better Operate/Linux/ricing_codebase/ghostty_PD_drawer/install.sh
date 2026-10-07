@@ -21,6 +21,13 @@ dropdown_css="$config_home/ghostty/dropdown.css"
 zdotdir="$data_home/ghostty-pd-drawer/zdotdir"
 user_zdotdir=${ZDOTDIR:-$HOME}
 
+# KGlobalAccel identifies the KWin script shortcuts by these action names, and
+# the keys live in the KWin script itself; the installer reads them for the
+# apply summary instead of keeping a second copy.
+toggle_action='Toggle Ghostty Dropdown'
+promote_action='Promote Ghostty Dropdown Session'
+kwin_script_source="$project_dir/src/kwin/ghostty-dropdown/contents/code/main.js"
+
 # Fixed unit from the previous tmux implementation. Apply removes it only
 # after the complete pre-apply state has been captured.
 legacy_dropdown_unit="$systemd_dir/ghostty-dropdown.service"
@@ -38,6 +45,8 @@ managed_paths=(
 
 kconfig_entries=(
     'kwinrc|Plugins|ghostty-dropdownEnabled'
+    'kglobalshortcutsrc|kwin|Toggle Ghostty Dropdown'
+    'kglobalshortcutsrc|kwin|Promote Ghostty Dropdown Session'
     'kwinrulesrc|General|rules'
     'kwinrulesrc|General|count'
     'kwinrulesrc|ghostty-dropdown-initial|Description'
@@ -59,9 +68,20 @@ require_command() {
     fi
 }
 
-for command_name in ghostty python3 systemctl kwriteconfig6 kreadconfig6 gdbus id rm; do
+for command_name in ghostty python3 systemctl kwriteconfig6 kreadconfig6 gdbus id rm sed; do
     require_command "$command_name"
 done
+
+script_shortcut() {
+    sed -n "s/^const $1 = \"\\(.*\\)\";$/\\1/p" "$kwin_script_source"
+}
+
+toggle_shortcut=$(script_shortcut toggleShortcut)
+promote_shortcut=$(script_shortcut promoteShortcut)
+if [[ -z $toggle_shortcut || -z $promote_shortcut ]]; then
+    printf 'Cannot read the shortcut keys from %s\n' "$kwin_script_source" >&2
+    exit 1
+fi
 
 if ! python3 -c 'import gi; gi.require_version("Gio", "2.0"); from gi.repository import Gio, GLib' 2>/dev/null; then
     printf 'Python 3 PyGObject with Gio 2.0 is required.\n' >&2
@@ -70,7 +90,6 @@ fi
 
 ghostty_bin=$(command -v ghostty)
 python_bin=$(command -v python3)
-kwriteconfig_bin=$(command -v kwriteconfig6)
 kill_bin=$(type -P kill)
 rm_bin=$(command -v rm)
 
@@ -95,7 +114,6 @@ USER_ZDOTDIR=$user_zdotdir \
 DRAWER_ZDOTDIR=$zdotdir \
 GHOSTTY_BIN=$ghostty_bin \
     PYTHON_BIN=$python_bin \
-    KWRITECONFIG_BIN=$kwriteconfig_bin \
     KILL_BIN=$kill_bin \
     RM_BIN=$rm_bin \
     CONTROLLER_PATH=$controller_path \
@@ -112,7 +130,6 @@ replacements = {
     "@RUNTIME_DIR@": os.environ["RUNTIME_DIR"],
     "@GHOSTTY_BIN@": os.environ["GHOSTTY_BIN"],
     "@PYTHON_BIN@": os.environ["PYTHON_BIN"],
-    "@KWRITECONFIG_BIN@": os.environ["KWRITECONFIG_BIN"],
     "@KILL_BIN@": os.environ["KILL_BIN"],
     "@RM_BIN@": os.environ["RM_BIN"],
     "@CONTROLLER_PATH@": os.environ["CONTROLLER_PATH"],
@@ -190,36 +207,76 @@ snapshot_state() {
     printf 'Captured pre-apply state in %s\n' "$snapshot_dir"
 }
 
-write_kwin_rule() {
-    local key=$1
-    local value=$2
-    kwriteconfig6 --file kwinrulesrc --group ghostty-dropdown-initial --key "$key" "$value"
+configure_kwin() {
+    local rules name
+    local rule_names=() retained=()
+    rules=$(kreadconfig6 --file kwinrulesrc --group General --key rules)
+    IFS=',' read -r -a rule_names <<< "$rules"
+    for name in "${rule_names[@]}"; do
+        if [[ -n $name && $name != ghostty-dropdown-initial ]]; then
+            retained+=("$name")
+        fi
+    done
+    rules=$(IFS=','; printf '%s' "${retained[*]}")
+    kwriteconfig6 --file kwinrulesrc --group General --key rules "$rules"
+    kwriteconfig6 --file kwinrulesrc --group General --key count "${#retained[@]}"
+    local entry file group key
+    for entry in "${kconfig_entries[@]}"; do
+        IFS='|' read -r file group key <<< "$entry"
+        if [[ $group == ghostty-dropdown-initial ]]; then
+            kwriteconfig6 --file "$file" --group "$group" --key "$key" --delete
+        fi
+    done
+    kwriteconfig6 --file kwinrc --group Plugins --key ghostty-dropdownEnabled true
 }
 
-configure_kwin() {
-    local rules
-    rules=$(kreadconfig6 --file kwinrulesrc --group General --key rules 2>/dev/null || true)
-    if [[ ,$rules, != *,ghostty-dropdown-initial,* ]]; then
-        rules=${rules:+$rules,}ghostty-dropdown-initial
-    fi
+unbound_shortcuts() {
+    # Print the drawer actions the running KGlobalAccel has no binding for.
+    # Runtime is the authority here: a shortcut conflict clears the binding in
+    # memory first and KGlobalAccel writes kglobalshortcutsrc afterwards, so a
+    # file read can still show the old key.
+    python3 - "$toggle_action" "$promote_action" <<'PY'
+import sys
 
-    local count=0
-    if [[ -n $rules ]]; then
-        local rule_names
-        IFS=',' read -r -a rule_names <<< "$rules"
-        count=${#rule_names[@]}
-    fi
+from gi.repository import Gio, GLib
 
-    kwriteconfig6 --file kwinrulesrc --group General --key rules "$rules"
-    kwriteconfig6 --file kwinrulesrc --group General --key count "$count"
-    write_kwin_rule Description 'Ghostty drop-down initial geometry'
-    write_kwin_rule positionrule 3
-    write_kwin_rule sizerule 3
-    write_kwin_rule types 1
-    write_kwin_rule wmclass com.mitchellh.ghostty.dropdown
-    write_kwin_rule wmclasscomplete false
-    write_kwin_rule wmclassmatch 1
-    kwriteconfig6 --file kwinrc --group Plugins --key ghostty-dropdownEnabled true
+try:
+    bus = Gio.bus_get_sync(Gio.BusType.SESSION)
+    infos = bus.call_sync(
+        "org.kde.kglobalaccel",
+        "/component/kwin",
+        "org.kde.kglobalaccel.Component",
+        "allShortcutInfos",
+        None,
+        None,
+        Gio.DBusCallFlags.NONE,
+        5000,
+        None,
+    ).unpack()[0]
+except GLib.Error:
+    sys.exit(1)
+
+bound = {row[0] for row in infos if row[6]}
+for action in sys.argv[1:]:
+    if action not in bound:
+        print(action)
+PY
+}
+
+release_unbound_shortcuts() {
+    # A shortcut conflict in another component clears our binding and leaves it
+    # empty: undoing the other side does not bring it back, and registering the
+    # same action again keeps the empty binding. Dropping the action while the
+    # script is unloaded lets the reload below register it again with the key
+    # from the KWin script. A binding the user assigned stays untouched.
+    local action
+    while IFS= read -r action; do
+        if [[ -z $action ]]; then
+            continue
+        fi
+        "$qdbus_command" org.kde.kglobalaccel /kglobalaccel org.kde.KGlobalAccel.unregister kwin "$action" >/dev/null 2>&1 || true
+        printf 'Rebinding %s; it had no binding\n' "$action"
+    done <<<"$1"
 }
 
 reload_kwin_script() {
@@ -241,7 +298,10 @@ reload_kwin_script() {
         return 1
     fi
 
+    local unbound
+    unbound=$(unbound_shortcuts 2>/dev/null || true)
     "$qdbus_command" org.kde.KWin /Scripting org.kde.kwin.Scripting.unloadScript ghostty-dropdown >/dev/null 2>&1 || true
+    release_unbound_shortcuts "$unbound"
     "$qdbus_command" org.kde.KWin /Scripting org.kde.kwin.Scripting.loadScript "$kwin_package_dir/contents/code/main.js" ghostty-dropdown >/dev/null
     "$qdbus_command" org.kde.KWin /Scripting org.kde.kwin.Scripting.start >/dev/null
     "$qdbus_command" org.kde.KWin /KWin org.kde.KWin.reconfigure >/dev/null 2>&1 || true
@@ -274,7 +334,7 @@ apply_feature() {
     remove_exact_path "$dropdown_css"
     install_source "$project_dir/src/libexec/ghostty-dropdown-controller.py" "$controller_path" 0755
     install_source "$project_dir/src/kwin/ghostty-dropdown/metadata.json" "$kwin_package_dir/metadata.json" 0644
-    install_source "$project_dir/src/kwin/ghostty-dropdown/contents/code/main.js" "$kwin_package_dir/contents/code/main.js" 0644
+    install_source "$kwin_script_source" "$kwin_package_dir/contents/code/main.js" 0644
     render_template "$project_dir/src/systemd/ghostty-dropdown-controller.service.in" "$controller_unit" 0644
     render_template "$project_dir/src/systemd/ghostty-dropdown@.service.in" "$dropdown_template_unit" 0644
     install_zdotdir_overlay
@@ -286,16 +346,24 @@ apply_feature() {
     systemctl --user enable --now ghostty-dropdown-controller.service
     systemctl --user restart ghostty-dropdown-controller.service
     reload_kwin_script
-    if [[ -n $qdbus_command && -f $runtime_dir/ghostty-pd-drawer/current ]]; then
+    local active_unit
+    if [[ -f $runtime_dir/ghostty-pd-drawer/current ]]; then
+        IFS= read -r active_unit < "$runtime_dir/ghostty-pd-drawer/current"
+    fi
+    if [[ -n $qdbus_command && ${active_unit:-} == ghostty-dropdown@i*_*.service ]]; then
         "$qdbus_command" com.mitchellh.ghostty.DropdownController \
             /com/mitchellh/ghostty/DropdownController \
             com.mitchellh.ghostty.DropdownController.Refresh >/dev/null 2>&1 || true
     fi
 
-    printf '\nApplied Ghostty shell-preserving drawer migration.\n'
-    printf '  Meta+`  toggle the current drawer\n'
-    printf '  Esc     hide the drawer at the shell prompt\n'
-    printf '  Meta+F  promote the drawer to a normal Ghostty window\n'
+    printf '\nApplied Ghostty resident drawer.\n'
+    printf '  %-6s toggle the current drawer\n' "$toggle_shortcut"
+    printf '  %-6s hide the drawer at the shell prompt\n' Esc
+    printf '  %-6s promote the drawer to a normal Ghostty window\n' "$promote_shortcut"
+    printf '  %-6s close the shell; keep GTK warm for the next drawer\n' exit
+    if [[ -n ${active_unit:-} && $active_unit != ghostty-dropdown@i*_*.service ]]; then
+        printf '  An existing on-demand drawer is preserved; exit it once to switch to the resident process.\n'
+    fi
     if systemctl --user is-active --quiet ghostty-dropdown.service; then
         printf '  A pre-migration tmux drawer is still running; close it once before testing the new path.\n'
     fi
@@ -353,7 +421,7 @@ status_feature() {
     check_zdotdir_link zlogin
     check_file "$project_dir/src/libexec/ghostty-dropdown-controller.py" "$controller_path" controller
     check_file "$project_dir/src/kwin/ghostty-dropdown/metadata.json" "$kwin_package_dir/metadata.json" 'KWin metadata'
-    check_file "$project_dir/src/kwin/ghostty-dropdown/contents/code/main.js" "$kwin_package_dir/contents/code/main.js" 'KWin script'
+    check_file "$kwin_script_source" "$kwin_package_dir/contents/code/main.js" 'KWin script'
     check_file "$temporary/controller.service" "$controller_unit" 'controller unit'
     check_file "$temporary/dropdown@.service" "$dropdown_template_unit" 'drawer instance unit'
     find "$temporary" -depth -delete
@@ -382,16 +450,13 @@ status_feature() {
     fi
 
     check_kconfig kwinrc Plugins ghostty-dropdownEnabled true 'KWin plugin enabled'
-    check_kconfig kwinrulesrc ghostty-dropdown-initial wmclass com.mitchellh.ghostty.dropdown 'KWin window match'
-    check_kconfig kwinrulesrc ghostty-dropdown-initial positionrule 3 'KWin position rule'
-    check_kconfig kwinrulesrc ghostty-dropdown-initial sizerule 3 'KWin size rule'
 
     local rules
     rules=$(kreadconfig6 --file kwinrulesrc --group General --key rules 2>/dev/null || true)
-    if [[ ,$rules, == *,ghostty-dropdown-initial,* ]]; then
-        printf 'ok    KWin rule registered\n'
+    if [[ ,$rules, != *,ghostty-dropdown-initial,* ]]; then
+        printf 'ok    obsolete initial window rule removed\n'
     else
-        printf 'FAIL  KWin rule not registered\n'
+        printf 'FAIL  obsolete initial window rule remains\n'
         status_failed=1
     fi
 
@@ -408,6 +473,19 @@ status_feature() {
 
     if systemctl --user is-active --quiet ghostty-dropdown.service; then
         printf 'info  pre-migration tmux drawer remains active until it is closed\n'
+    fi
+
+    if unbound_actions=$(unbound_shortcuts 2>/dev/null); then
+        local shortcut
+        for shortcut in "$toggle_action" "$promote_action"; do
+            if grep -qxF -- "$shortcut" <<<"$unbound_actions"; then
+                printf 'info  shortcut %s: unbound\n' "$shortcut"
+            else
+                printf 'info  shortcut %s: bound\n' "$shortcut"
+            fi
+        done
+    else
+        printf 'info  shortcut bindings unknown: the KWin runtime did not answer\n'
     fi
 
     return "$status_failed"
@@ -439,6 +517,17 @@ rollback_feature() {
         "$qdbus_command" org.kde.KWin /Scripting org.kde.kwin.Scripting.unloadScript ghostty-dropdown >/dev/null 2>&1 || true
     fi
     systemctl --user disable --now ghostty-dropdown-controller.service >/dev/null 2>&1 || true
+
+    # Promotion starts a fresh, windowless resident. Stop only that empty
+    # process; a migrated terminal with a shell must survive rollback.
+    local active_state=()
+    if [[ -f $runtime_dir/ghostty-pd-drawer/current ]]; then
+        mapfile -t active_state < "$runtime_dir/ghostty-pd-drawer/current"
+        if [[ ${#active_state[@]} == 2 && ${active_state[0]} == ghostty-dropdown@i*_*.service ]]; then
+            systemctl --user stop "${active_state[0]}"
+            rm -f -- "$runtime_dir/ghostty-pd-drawer/current"
+        fi
+    fi
 
     local saved_targets=()
     mapfile -t saved_targets < "$snapshot_dir/targets"

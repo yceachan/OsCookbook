@@ -2,6 +2,13 @@ const dropdownAppId = "com.mitchellh.ghostty.dropdown";
 const controllerService = "com.mitchellh.ghostty.DropdownController";
 const controllerPath = "/com/mitchellh/ghostty/DropdownController";
 
+// Global shortcut keys. KGlobalAccel keeps whatever binding it stores in
+// kglobalshortcutsrc: a conflict in another component can clear it, and
+// install.sh reclaims the action in that case. Changing a key here needs
+// ./install.sh apply, which re-registers the shortcuts.
+const toggleShortcut = "Meta+`";
+const promoteShortcut = "Meta+F";
+
 let pendingOutputName = "";
 let targetOutputName = "";
 let managedWindow;
@@ -11,10 +18,17 @@ let handlingHideRequest = false;
 let revealSerial = 0;
 let dropdownHidden = false;
 let returnWindow;
+let revealingWindow;
+let startingDropdown = false;
 
 function hasDropdownIdentity(window) {
-    return String(window.resourceClass).toLowerCase() === dropdownAppId
-        || String(window.resourceName).toLowerCase() === dropdownAppId;
+    if (window.deleted) {
+        return false;
+    }
+    return [window.resourceClass, window.resourceName].some((value) => {
+        const identity = String(value).toLowerCase();
+        return identity === dropdownAppId || identity.startsWith(dropdownAppId + ".");
+    });
 }
 
 function isPromoted(window) {
@@ -26,7 +40,7 @@ function isDropdown(window) {
 }
 
 function findDropdown() {
-    if (managedWindow !== undefined && workspace.windowList().includes(managedWindow)) {
+    if (managedWindow !== undefined && !managedWindow.deleted && workspace.windowList().includes(managedWindow)) {
         return managedWindow;
     }
     return workspace.windowList().find(isDropdown);
@@ -83,17 +97,35 @@ function enforceGeometry(window, output, desktop) {
     }
 
     const wanted = desiredGeometry(output, desktop);
-    const current = window.frameGeometry;
-    if (Math.abs(current.x - wanted.x) <= 1
-            && Math.abs(current.y - wanted.y) <= 1
-            && Math.abs(current.width - wanted.width) <= 1
-            && Math.abs(current.height - wanted.height) <= 1) {
+    if (geometryMatches(window.frameGeometry, wanted)) {
         return;
     }
 
     changingGeometry = true;
     window.frameGeometry = wanted;
     changingGeometry = false;
+}
+
+function geometryMatches(current, wanted) {
+    return Math.abs(current.x - wanted.x) <= 1
+        && Math.abs(current.y - wanted.y) <= 1
+        && Math.abs(current.width - wanted.width) <= 1
+        && Math.abs(current.height - wanted.height) <= 1;
+}
+
+function finishReveal(window) {
+    if (revealingWindow !== window || dropdownHidden || managedWindow !== window) {
+        return;
+    }
+    const target = outputByName(targetOutputName) || window.output || workspace.activeScreen;
+    const desktop = workspace.currentDesktopForScreen(target) || workspace.currentDesktop;
+    if (!geometryMatches(window.frameGeometry, desiredGeometry(target, desktop))) {
+        return;
+    }
+    revealingWindow = undefined;
+    window.opacity = 1;
+    workspace.raiseWindow(window);
+    workspace.activeWindow = window;
 }
 
 function prepareDropdown(window, output) {
@@ -120,7 +152,9 @@ function revealDropdown(window, output) {
     const serial = ++revealSerial;
 
     dropdownHidden = false;
+    revealingWindow = undefined;
     window.opacity = 0;
+    window.minimized = false;
     prepareDropdown(window, output);
     if (serial !== revealSerial || dropdownHidden || managedWindow !== window) {
         return;
@@ -128,14 +162,15 @@ function revealDropdown(window, output) {
     const target = outputByName(targetOutputName) || window.output || workspace.activeScreen;
     const desktop = workspace.currentDesktopForScreen(target) || workspace.currentDesktop;
     enforceGeometry(window, target, desktop);
-    window.minimized = false;
-    window.opacity = 1;
-    workspace.raiseWindow(window);
-    workspace.activeWindow = window;
+    // Wayland resizing is asynchronous. Reveal after the client acknowledges
+    // the requested geometry, including when its GTK process is already warm.
+    revealingWindow = window;
+    finishReveal(window);
 }
 
 function hideDropdown(window) {
     ++revealSerial;
+    revealingWindow = undefined;
     dropdownHidden = true;
     window.opacity = 0;
     window.keepAbove = false;
@@ -156,17 +191,17 @@ function hideDropdown(window) {
 }
 
 function startDropdown(output) {
-    const desktop = workspace.currentDesktopForScreen(output) || workspace.currentDesktop;
-    const geometry = desiredGeometry(output, desktop);
+    if (startingDropdown) {
+        return;
+    }
+    startingDropdown = true;
+    pendingOutputName = output.name;
     callDBus(
         controllerService,
         controllerPath,
         controllerService,
         "Start",
-        geometry.x,
-        geometry.y,
-        geometry.width,
-        geometry.height
+        () => { startingDropdown = false; }
     );
 }
 
@@ -176,6 +211,7 @@ function promoteDropdown(window, width, height) {
     }
 
     ++revealSerial;
+    revealingWindow = undefined;
     // Promote on the screen the drawer was last shown on, so promoting a hidden
     // drawer does not drag it onto whatever output currently has focus.
     const output = outputByName(targetOutputName) || window.output || workspace.activeScreen;
@@ -236,7 +272,6 @@ function toggleDropdown() {
         returnWindow = active;
     }
     const output = focusedOutput();
-    pendingOutputName = output ? output.name : "";
     startDropdown(output);
 }
 
@@ -287,6 +322,7 @@ function configureNewWindow(window, reveal) {
             const target = outputByName(targetOutputName) || window.output || workspace.activeScreen;
             const desktop = workspace.currentDesktopForScreen(target) || workspace.currentDesktop;
             enforceGeometry(window, target, desktop);
+            finishReveal(window);
         });
         window.maximizedAboutToChange.connect((mode) => {
             hideOnMaximize = mode !== 0;
@@ -309,6 +345,7 @@ function configureNewWindow(window, reveal) {
             if (managedWindow === window) {
                 managedWindow = undefined;
                 dropdownHidden = false;
+                revealingWindow = undefined;
             }
         });
     }
@@ -320,26 +357,34 @@ function configureNewWindow(window, reveal) {
         return;
     }
 
-    dropdownHidden = false;
-    prepareDropdown(window, output);
-    window.minimized = false;
-    window.opacity = 1;
-    workspace.raiseWindow(window);
-    workspace.activeWindow = window;
+    revealDropdown(window, output);
 }
 
 function manageNewWindow(window) {
     if (!hasDropdownIdentity(window)) {
         return;
     }
+    window.opacity = 0;
     callDBus(
         controllerService,
         controllerPath,
         controllerService,
         "Register",
-        window.pid
+        window.pid,
+        (current) => {
+            if (window.deleted) {
+                return;
+            }
+            if (current) {
+                startingDropdown = false;
+                configureNewWindow(window, true);
+            } else {
+                // A new normal window belonging to an already promoted process.
+                promotedWindows.push(window);
+                window.opacity = 1;
+            }
+        }
     );
-    configureNewWindow(window, true);
 }
 
 function classifyExistingWindow(window) {
@@ -365,14 +410,14 @@ function classifyExistingWindow(window) {
 registerShortcut(
     "Toggle Ghostty Dropdown",
     "Show or hide the Ghostty drop-down terminal",
-    "Meta+`",
+    toggleShortcut,
     toggleDropdown
 );
 
 registerShortcut(
     "Promote Ghostty Dropdown Session",
     "Turn the drawer into a normal Ghostty window",
-    "Meta+F",
+    promoteShortcut,
     promoteActiveDropdown
 );
 

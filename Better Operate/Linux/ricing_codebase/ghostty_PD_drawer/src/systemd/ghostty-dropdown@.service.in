@@ -10,6 +10,6 @@ WorkingDirectory=@HOME@
 # should start with; see src/zsh/drawer-zshrc.in.
 Environment=GHOSTTY_PD_DRAWER_INSTANCE=%i
 Environment=ZDOTDIR=@DRAWER_ZDOTDIR@
-ExecStart=@GHOSTTY_BIN@ --config-default-files=false --config-file=%t/ghostty-pd-drawer/%i.ghostty --gtk-single-instance=false --class=com.mitchellh.ghostty.dropdown
+ExecStart=@GHOSTTY_BIN@ --config-default-files=false --config-file=%t/ghostty-pd-drawer/%i.ghostty --initial-window=false --gtk-single-instance=true --class=com.mitchellh.ghostty.dropdown.%i
 ExecReload=@KILL_BIN@ -USR2 $MAINPID
 ExecStopPost=@RM_BIN@ -f %t/ghostty-pd-drawer/%i.ghostty
