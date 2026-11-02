@@ -1,0 +1,8 @@
+keymap:
+  - name: Open Snipaste instead of Chrome F1 help
+    application:
+      only: google-chrome
+    exact_match: true
+    remap:
+      F1:
+        launch: ["/home/pi/work/gitrepo/kde-better-prtsc/scripts/run-snipaste.sh", "snip"]

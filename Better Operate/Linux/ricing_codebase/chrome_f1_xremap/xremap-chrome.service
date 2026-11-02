@@ -1,0 +1,12 @@
+[Unit]
+Description=Open Snipaste with F1 in Google Chrome
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=%h/.local/bin/xremap --desktop kde --watch=config,device --no-window-logging --allow-launch=true %h/.config/xremap/config.yml
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=graphical-session.target

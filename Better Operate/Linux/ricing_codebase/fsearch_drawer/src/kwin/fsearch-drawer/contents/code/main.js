@@ -14,6 +14,19 @@ function isFSearch(window) {
         && window.normalWindow && !window.transient;
 }
 
+function updateStacking() {
+    if (!managedWindow || managedWindow.deleted) {
+        return;
+    }
+    let active = workspace.activeWindow;
+    while (active && active !== managedWindow) {
+        active = active.transientFor;
+    }
+    const foreground = active === managedWindow && !managedWindow.minimized;
+    managedWindow.keepAbove = foreground;
+    managedWindow.keepBelow = !foreground && !managedWindow.minimized;
+}
+
 function rememberFocus() {
     const active = workspace.activeWindow;
     if (active && active.normalWindow && !isFSearch(active)
@@ -96,6 +109,7 @@ function showWindow(window, output) {
     workspace.sendClientToScreen(window, output);
     window.desktops = [workspace.currentDesktopForScreen(output) || workspace.currentDesktop];
     window.activities = [workspace.currentActivity];
+    window.keepBelow = false;
     window.keepAbove = true;
     changingGeometry = false;
     enforceGeometry(window);
@@ -105,6 +119,7 @@ function hideWindow(window) {
     revealing = false;
     window.opacity = 1;
     window.keepAbove = false;
+    window.keepBelow = false;
     window.minimized = true;
     if (returnWindow && !returnWindow.deleted && workspace.windowList().includes(returnWindow)) {
         workspace.activeWindow = returnWindow;
@@ -153,6 +168,7 @@ function manageWindow(window, existing) {
             revealing = false;
             window.opacity = 1;
             window.keepAbove = false;
+            window.keepBelow = false;
         } else {
             // Restoring through Plasma's existing task button bypasses Exec.
             // Capture the external focus before FSearch receives activation.
@@ -185,7 +201,9 @@ workspace.windowActivated.connect(window => {
     } else {
         rememberFocus();
     }
+    updateStacking();
 });
+updateStacking();
 workspace.screensChanged.connect(() => {
     if (managedWindow && !managedWindow.deleted && !managedWindow.minimized) {
         showWindow(managedWindow, outputByName(targetOutputName) || focusedOutput());
